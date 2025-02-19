@@ -41,8 +41,22 @@
 {% block scripts %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.15/jstree.min.js"></script>
+<script src="{{ url_for('static', filename='js/ldap_tree.js') }}"></script>
+<script src="{{ url_for('static', filename='js/user_search.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script type="text/javascript">
 $(function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Initialize user action buttons
+    initializeUserActions(false);
+    initializeResetPassword();
+    initializeRestoreModal();
+
     // Gestion des groupes
     $('#addToGroup').on('click', function() {
         var groupDN = $('#groupToAdd').val();
@@ -57,9 +71,9 @@ $(function() {
                 $('#userGroups').append(`
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         ${groupName}
-                        <button type="button" class="btn btn-danger btn-sm remove-from-group" data-group-dn="${groupDN}">
-                            <i class="fas fa-user-minus"></i>
-                        </button>
+                                    <button type="button" class="btn btn-danger remove-from-group flex-shrink-0" data-group-dn="${groupDN}" data-bs-toggle="tooltip" title="{{ _('Retirer du groupe') }}">
+                                        <i class="fas fa-user-minus"></i>
+                                    </button>
                     </div>
                 `);
                 $('#groupToAdd option:selected').remove();
@@ -362,18 +376,51 @@ $(function() {
                         <i class="fas fa-user-shield section-icon"></i>{{ _('État du compte') }}
                     </div>
                     <div class="card-body">
-                        <div class="d-flex flex-column gap-4">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="accountActive" name="accountActive" {% if user.attrs.userAccountControl and user.attrs.userAccountControl != '514' and user.attrs.userAccountControl != 514 %}checked{% endif %}>
-                                <label class="form-check-label" for="accountActive">
-                                    <i class="fas fa-toggle-on me-2"></i>{{ _('Compte actif') }}
-                                </label>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="accountLocked" name="accountLocked" {% if not user.lockoutTime or not user.lockoutTime.value %}checked{% endif %}>
-                                <label class="form-check-label" for="accountLocked">
-                                    <i class="fas fa-lock-open me-2"></i>{{ _('Compte déverrouillé') }}
-                                </label>
+                        <div class="d-flex flex-column">
+                            <!--<div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="accountActive" name="accountActive" {% if user.attrs.userAccountControl and user.attrs.userAccountControl != '514' and user.attrs.userAccountControl != 514 %}checked{% endif %}>
+                                    <label class="form-check-label" for="accountActive">
+                                        <i class="fas fa-toggle-on me-2"></i>{{ _('Compte actif') }}
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="accountLocked" name="accountLocked" {% if not user.lockoutTime or not user.lockoutTime.value %}checked{% endif %}>
+                                    <label class="form-check-label" for="accountLocked">
+                                        <i class="fas fa-lock-open me-2"></i>{{ _('Compte déverrouillé') }}
+                                    </label>
+                                </div>
+                            </div>-->
+                            <div class="d-flex justify-content-between align-items-center">
+                                {% if ',OU=Corbeille,' not in user.entry_dn %}
+                                <a href="#" class="btn btn-danger btn-sm trash-user" data-dn="{{ user.entry_dn }}" data-bs-toggle="tooltip" title="{{ _('Mettre à la corbeille') }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                                {% endif %}
+
+                                {% if user.attrs.userAccountControl is defined and user.attrs.userAccountControl | int == 514 %}
+                                <button type="button" class="btn btn-success btn-sm unlock-user" data-dn="{{ user.entry_dn }}" data-bs-toggle="tooltip" title="{{ _('Déverrouiller') }}">
+                                    <i class="fas fa-unlock"></i>
+                                </button>
+                                {% else %}
+                                <button type="button" class="btn btn-warning btn-sm lock-user" data-dn="{{ user.entry_dn }}" data-bs-toggle="tooltip" title="{{ _('Verrouiller') }}">
+                                    <i class="fas fa-lock"></i>
+                                </button>
+                                {% endif %}
+
+                                {% if ',OU=Corbeille,' in user.entry_dn %}
+                                <a href="#" class="btn btn-success btn-sm restore-user" data-dn="{{ user.entry_dn }}" data-bs-toggle="tooltip" title="{{ _('Restaurer') }}" onclick="$('#restoreModal').modal('show')">
+                                    <i class="fas fa-trash-restore"></i>
+                                </a>
+                                {% else %}
+                                <a href="#" class="btn btn-warning btn-sm move-user" data-dn="{{ user.entry_dn }}" data-bs-toggle="tooltip" title="{{ _('Déplacer') }}" onclick="$('#restoreModal').modal('show')">
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                                {% endif %}
+
+                                <button type="button" class="btn btn-info btn-sm reset-password-btn" title="{{ _('Reset password') }}" data-dn="{{ user.entry_dn }}" data-bs-toggle="tooltip" onclick="event.preventDefault(); $('#resetPasswordModal').modal('show')">
+                                    <i class="fas fa-key"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -422,20 +469,22 @@ $(function() {
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label"><i class="fas fa-layer-group me-2"></i>{{ _('Groupes de l\'utilisateur') }}</label>
-                            <select class="form-select mb-2" id="groupToAdd" name="groupToAdd">
-                                <option value="">{{ _('Sélectionner un groupe à ajouter...') }}</option>
-                                {% for dn, name in groups.items() %}
-                                <option value="{{ dn }}">{{ name }}</option>
-                                {% endfor %}
-                            </select>
-                            <button type="button" class="btn btn-success mb-3" id="addToGroup">
-                                <i class="fas fa-user-plus me-2"></i>{{ _('Ajouter au groupe') }}
-                            </button>
+                            <div class="d-flex gap-2 mb-3">
+                                <select class="form-select" id="groupToAdd" name="groupToAdd">
+                                    <option value="">{{ _('Sélectionner un groupe à ajouter...') }}</option>
+                                    {% for dn, name in groups.items() %}
+                                    <option value="{{ dn }}">{{ name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-success flex-shrink-0" id="addToGroup">
+                                    <i class="fas fa-user-plus"></i>
+                                </button>
+                            </div>
                             <div class="list-group" id="userGroups">
                                 {% for group in user_groups %}
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     {{ group.name }}
-                                    <button type="button" class="btn btn-danger btn-sm remove-from-group" data-group-dn="{{ group.dn }}">
+                                    <button type="button" class="btn btn-danger remove-from-group flex-shrink-0" data-group-dn="{{ group.dn }}" data-bs-toggle="tooltip" title="{{ _('Retirer du groupe') }}">
                                         <i class="fas fa-user-minus"></i>
                                     </button>
                                 </div>
@@ -508,12 +557,94 @@ $(function() {
         </div>
 
         <div class="row">
-            <div class="col-12 text-center my-4">
                 <button type="submit" class="btn btn-primary btn-lg px-5">
                     <i class="fas fa-save me-2"></i>{{ _('Enregistrer les modifications') }}
                 </button>
             </div>
         </div>
     </form>
+
+    <!-- Password Reset Modal -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPasswordModalLabel">{{ _('Reset Password') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="resetPasswordForm">
+                        <input type="hidden" id="resetPasswordDn" name="dn">
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">{{ _('New Password') }}</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="forceReset">
+                                <label class="form-check-label" for="forceReset">
+                                    {{ _('User must reset password at next login') }}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableUser">
+                                <label class="form-check-label" for="enableUser">
+                                    {{ _('Enable user if disabled') }}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="preventChange">
+                                <label class="form-check-label" for="preventChange">
+                                    {{ _('User cannot change password') }}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="neverExpire">
+                                <label class="form-check-label" for="neverExpire">
+                                    {{ _('Password never expires') }}
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="button" class="btn btn-primary" id="confirmResetPassword">{{ _('Reset') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Modal -->
+    <div class="modal fade" id="restoreModal" tabindex="-1" aria-labelledby="restoreModalLabel" aria-hidden="true">
+        <div class="modal-dialog ou-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="restoreModalLabel">{{ _('Restore User') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="restoreForm">
+                        <input type="hidden" name="dn" id="restoreDn">
+                        <div class="form-group">
+                            <label for="ouSelect" class="form-label">{{ _('Select Organizational Unit (OU)') }}</label>
+                            <div id="ldapTree" class="ldap-tree tree-container mb-2"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="button" class="btn btn-success" id="confirmRestore">{{ _('Restore') }}</button>
+                    <button type="button" class="btn btn-warning d-none" id="confirmMove">{{ _('Move') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

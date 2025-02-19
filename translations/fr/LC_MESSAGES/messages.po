@@ -16,6 +16,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
+#: templates/user_edit.html:334
+msgid "Account Status"
+msgstr "État du compte"
+
+#: templates/user_edit.html:341
+msgid "Active account"
+msgstr "Compte actif"
+
+#: templates/user_edit.html:347
+msgid "Unlocked account"
+msgstr "Compte déverrouillé"
+
+#: templates/user_search.html:153
+msgid "Mettre a la corbeille"
+msgstr "Mettre à la corbeille"
+
+#: templates/user_search.html:156
+msgid "Unlock"
+msgstr "Déverrouiller" 
+
+#: templates/user_search.html:158
+msgid "Lock"
+msgstr "Verrouiller"
+
+#: templates/user_search.html:161
+msgid "Restore"
+msgstr "Restaurer"
+
+#: templates/user_search.html:163
+msgid "Move"
+msgstr "Déplacer"
+
+#: templates/user_search.html:164
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
 #: templates/user_create.html:107
 msgid "Date d'expiration du compte"
 msgstr "Date d'expiration du compte"
@@ -222,23 +258,39 @@ msgstr "Afficher/Modifier"
 msgid "Move to trash"
 msgstr "Mettre à la corbeille"
 
-#: templates/user_search.html:156
+#: templates/user_edit.html:156
 msgid "Unlock"
 msgstr "Déverrouiller"
 
-#: templates/user_search.html:158
+#: templates/user_edit.html:158
+msgid "Unlock account"
+msgstr "Activer le compte (Compte désactivé)"
+
+#: templates/user_edit.html:158
 msgid "Lock"
 msgstr "Verrouiller"
 
-#: templates/user_search.html:161
+#: templates/user_edit.html:158
+msgid "Lock account"
+msgstr "Désactiver le compte (Compte actif)"
+
+#: templates/user_edit.html:161
 msgid "Restore"
 msgstr "Restaurer"
 
-#: templates/user_search.html:163
+#: templates/user_edit.html:161
+msgid "Restore user"
+msgstr "Restaurer l'utilisateur"
+
+#: templates/user_edit.html:163
 msgid "Move"
 msgstr "Déplacer"
 
-#: templates/user_search.html:164
+#: templates/user_edit.html:163
+msgid "Move user"
+msgstr "Déplacer l'utilisateur"
+
+#: templates/user_edit.html:164
 msgid "Reset password"
 msgstr "Réinitialiser le mot de passe"
 
@@ -573,19 +625,19 @@ msgstr "Format de l'email :"
 
 #: templates/settings/ldap.html:109
 msgid "Firstname@{domain.com}"
-msgstr "Prénom@{domaine.fr}"
+msgstr "Prénom@{domaine.com}"
 
 #: templates/settings/ldap.html:115
 msgid "LASTNAME@{domain.com}"
-msgstr "NOM@{domaine.fr}"
+msgstr "NOM@{domaine.com}"
 
 #: templates/settings/ldap.html:121
 msgid "Firstname.LASTNAME@{domain.com}"
-msgstr "Prénom.NOM@{domaine.fr}"
+msgstr "Prénom.NOM@{domaine.com}"
 
 #: templates/settings/ldap.html:127
 msgid "LASTNAME.Firstname@{domain.com}"
-msgstr "NOM.Prénom@{domaine.fr}"
+msgstr "NOM.Prénom@{domaine.com}"
 
 #: templates/settings/ldap.html:167
 msgid "Save"

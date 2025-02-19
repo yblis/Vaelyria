@@ -103,32 +103,59 @@
     </div>
 </div>
 
-<table class="table table-striped" id="groupsTable">
-    <thead>
-        <tr>
-            <th>{{ _('Nom du groupe') }}</th>
-            <th>{{ _('Actions') }}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for dn, name in groups %}
-        <tr>
-            <td>{{ name }}</td>
-            <td>
-                <a href="{{ url_for('groups.group_members', group_dn=dn) }}" class="btn btn-sm btn-info" title="{{ _('Voir les membres') }}">
+<!-- Vue mobile en cartes -->
+<div class="group-cards-list">
+    {% for dn, name in groups %}
+    <div class="group-card">
+        <div class="group-card-body">
+            <h4 class="group-name">{{ name }}</h4>
+        </div>
+        <div class="group-card-footer">
+            <div class="group-card-actions">
+                <a href="{{ url_for('groups.group_members', group_dn=dn) }}" class="btn btn-info" title="{{ _('Voir les membres') }}">
                     <i class="fas fa-users"></i>
                 </a>
-                <button onclick="showExportModal('{{ dn }}')" class="btn btn-sm btn-success" title="{{ _('Exporter') }}">
+                <button onclick="showExportModal('{{ dn }}')" class="btn btn-success" title="{{ _('Exporter') }}">
                     <i class="fas fa-file-export"></i>
                 </button>
-                <button onclick="showDeleteModal('{{ dn }}')" class="btn btn-sm btn-danger" title="{{ _('Supprimer') }}">
+                <button onclick="showDeleteModal('{{ dn }}')" class="btn btn-danger" title="{{ _('Supprimer') }}">
                     <i class="fas fa-trash"></i>
                 </button>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Vue desktop en tableau -->
+<div class="group-table-responsive">
+    <table class="table table-striped group-table-list" id="groupsTable">
+        <thead>
+            <tr>
+                <th>{{ _('Nom du groupe') }}</th>
+                <th>{{ _('Actions') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dn, name in groups %}
+            <tr>
+                <td>{{ name }}</td>
+                <td>
+                    <a href="{{ url_for('groups.group_members', group_dn=dn) }}" class="btn btn-sm btn-info" title="{{ _('Voir les membres') }}">
+                        <i class="fas fa-users"></i>
+                    </a>
+                    <button onclick="showExportModal('{{ dn }}')" class="btn btn-sm btn-success" title="{{ _('Exporter') }}">
+                        <i class="fas fa-file-export"></i>
+                    </button>
+                    <button onclick="showDeleteModal('{{ dn }}')" class="btn btn-sm btn-danger" title="{{ _('Supprimer') }}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <!-- Page info -->
 <div class="text-center text-muted mb-2">

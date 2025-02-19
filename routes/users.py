@@ -1550,7 +1550,7 @@ def move_user(dn):
         
         if result:
             log_user_action('Move User', f'Successfully moved user from {dn} to {new_dn}')
-            return jsonify({'success': True})
+            return jsonify({'success': True, 'new_dn': new_dn})
         else:
             log_user_action('Move User Error', f'Failed to move user: {dn}. Error: {conn.result["description"]}')
             return jsonify({'success': False, 'error': conn.result['description']}), 400
@@ -1569,8 +1569,11 @@ def restore_user_route(dn):
     result = restore_user(conn, dn, target_ou)
 
     if result['result'] == 0:
+        # Récupérer le nouveau DN de l'utilisateur
+        old_cn = dn.split(',')[0]
+        new_dn = f"{old_cn},{target_ou}"
         log_user_action('Restore User', f'Successfully restored user from trash: {dn}')
-        return jsonify({'success': True})
+        return jsonify({'success': True, 'new_dn': new_dn})
     else:
         log_user_action('Restore User Error', f'Failed to restore user: {dn}. Error: {result["description"]}')
         return jsonify({'success': False, 'error': result['description']}), 400

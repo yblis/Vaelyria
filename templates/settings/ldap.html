@@ -2,53 +2,97 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>{{ _('LDAP Configuration') }}</h2>
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="fas fa-cogs me-2"></i>{{ _('LDAP Configuration') }}
+        </h2>
+    </div>
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
+                <div class="alert alert-{{ category }} d-flex align-items-center">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ message }}
+                </div>
             {% endfor %}
         {% endif %}
     {% endwith %}
     
-    <form method="POST" class="mt-4">
-        <div class="form-group mb-3">
-            <label for="trash_ou">{{ _('Trash OU') }}</label>
-            <input type="text" class="form-control" id="trash_ou" name="trash_ou" 
-                   value="{{ config.trash_ou if config else '' }}" required>
-            <small class="form-text text-muted">{{ _('Example: OU=Disabled,DC=example,DC=com') }}</small>
-        </div>
-
-        <div class="form-group mb-3">
-            <label for="default_password">{{ _('Default Password') }}</label>
-            <input type="password" class="form-control" id="default_password" name="default_password" 
-                   placeholder="{{ _('Leave empty to keep current password') }}">
-            <small class="form-text text-muted">{{ _('Default password for new users') }}</small>
-        </div>
-
-        <div class="form-group mb-3">
-            <label for="domains">{{ _('Active Directory Domains') }}</label>
-            <textarea class="form-control" id="domains" name="domains" rows="3" placeholder="example.com&#10;example.org&#10;example.net" style="min-height: 100px; resize: vertical;">{{ config.domains if config else '' }}</textarea>
-            <small class="form-text text-muted">{{ _('One domain per line (example: example.com)') }}</small>
-        </div>
-
-        <div class="form-group mb-3">
-            <label for="tenant">{{ _('Microsoft 365 Tenant (For hybrid environments)') }}</label>
-            <div class="input-group">
-                <span class="input-group-text">@</span>
-                <input type="text" class="form-control" id="tenant" name="tenant" 
-                       value="{{ config.tenant if config else '' }}" placeholder="tenant">
-                <span class="input-group-text">.onmicrosoft.com</span>
+    <form method="POST" class="settings-form">
+        <!-- Section Configuration de Base -->
+        <div class="card mb-4 settings-card">
+            <div class="card-header">
+                <h3 class="card-title h5 mb-0">
+                    <i class="fas fa-folder me-2"></i>{{ _('Configuration de Base') }}
+                </h3>
             </div>
-            <small class="form-text text-muted">{{ _('Example: if your domain is @contoso.onmicrosoft.com, enter "contoso"') }}</small>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label for="trash_ou" class="form-label">
+                        <i class="fas fa-trash me-2"></i>{{ _('Trash OU') }}
+                    </label>
+                    <input type="text" class="form-control" id="trash_ou" name="trash_ou" 
+                           value="{{ config.trash_ou if config else '' }}" required>
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        {{ _('Example: OU=Disabled,DC=example,DC=com') }}
+                    </small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="default_password" class="form-label">
+                        <i class="fas fa-key me-2"></i>{{ _('Default Password') }}
+                    </label>
+                    <input type="password" class="form-control" id="default_password" name="default_password" 
+                           placeholder="{{ _('Leave empty to keep current password') }}">
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        {{ _('Default password for new users') }}
+                    </small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="domains" class="form-label">
+                        <i class="fas fa-globe me-2"></i>{{ _('Active Directory Domains') }}
+                    </label>
+                    <textarea class="form-control settings-textarea" id="domains" name="domains" rows="3" 
+                              placeholder="example.com&#10;example.org&#10;example.net">{{ config.domains if config else '' }}</textarea>
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        {{ _('One domain per line (example: example.com)') }}
+                    </small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="tenant" class="form-label">
+                        <i class="fab fa-microsoft me-2"></i>{{ _('Microsoft 365 Tenant (For hybrid environments)') }}
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">@</span>
+                        <input type="text" class="form-control" id="tenant" name="tenant" 
+                               value="{{ config.tenant if config else '' }}" placeholder="tenant">
+                        <span class="input-group-text">.onmicrosoft.com</span>
+                    </div>
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        {{ _('Example: if your domain is @contoso.onmicrosoft.com, enter "contoso"') }}
+                    </small>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group mb-3">
-            <label>{{ _('Username Configuration') }}</label>
-            <div class="border p-3 rounded">
-                <div class="mb-3">
-                    <label>{{ _('Pattern order:') }}</label>
+        <!-- Section Configuration du nom d'utilisateur -->
+        <div class="card mb-4 settings-card">
+            <div class="card-header">
+                <h3 class="card-title h5 mb-0">
+                    <i class="fas fa-user me-2"></i>{{ _('Username Configuration') }}
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <label class="mb-3">{{ _('Pattern order:') }}</label>
+                    <div class="ps-3">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="username_pattern_order" id="nom_prenom" value="NOM_PRENOM" {% if config.username_pattern_order == 'NOM_PRENOM' %}checked{% endif %}>
                         <label class="form-check-label" for="nom_prenom">
@@ -61,9 +105,10 @@
                             {{ _('Firstname LASTNAME') }}
                         </label>
                     </div>
+                    </div>
                 </div>
 
-                <div class="row">
+                <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="username_first_part_chars">{{ _('Number of characters first part') }}</label>
@@ -98,11 +143,17 @@
             </div>
         </div>
 
-        <div class="form-group mb-3">
-            <label>{{ _('Email Configuration') }}</label>
-            <div class="border p-3 rounded">
-                <div class="mb-3">
-                    <label>{{ _('Email format:') }}</label>
+        <!-- Section Configuration email -->
+        <div class="card mb-4 settings-card">
+            <div class="card-header">
+                <h3 class="card-title h5 mb-0">
+                    <i class="fas fa-envelope me-2"></i>{{ _('Email Configuration') }}
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <label class="mb-3">{{ _('Email format:') }}</label>
+                    <div class="ps-3">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="email_pattern_order" id="email_prenom" value="PRENOM" {% if config.email_pattern_order == 'PRENOM' %}checked{% endif %}>
                         <label class="form-check-label" for="email_prenom">
@@ -127,9 +178,10 @@
                             {{ _('LASTNAME.Firstname@{domain.com}') }}
                         </label>
                     </div>
+                    </div>
                 </div>
 
-                <div class="row">
+                <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="email_first_part_chars">{{ _('Number of characters first part') }}</label>
@@ -164,7 +216,11 @@
             </div>
         </div>
         
-        <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+        <div class="d-grid d-md-flex justify-content-md-end">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>{{ _('Save') }}
+            </button>
+        </div>
     </form>
 </div>
 

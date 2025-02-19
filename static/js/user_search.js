@@ -287,7 +287,8 @@ function restoreUser() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload();
+            // Rediriger vers la page d'édition avec le nouveau DN
+            window.location.href = '/users/edit/' + encodeURIComponent(data.new_dn);
         } else {
             alert("Erreur lors de la restauration : " + data.error);
         }
@@ -309,7 +310,8 @@ function moveUser() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload();
+            // Rediriger vers la page d'édition avec le nouveau DN
+            window.location.href = '/users/edit/' + encodeURIComponent(data.new_dn);
         } else {
             alert("Erreur lors du déplacement : " + data.error);
         }

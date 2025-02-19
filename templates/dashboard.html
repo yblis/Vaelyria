@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row text-center mb-4">
+<div class="welcome-section mb-4">
     <div class="card">
-        <br>
-        <h3>{{ _('Bienvenue dans Vaelyria') }}</h3>
-        <p class="lead">{{ _('Gestion de l\'Active Directory') }}</p>
+        <div class="card-body text-center">
+            <h3>{{ _('Bienvenue dans Vaelyria') }}</h3>
+            <p class="lead">{{ _('Gestion de l\'Active Directory') }}</p>
+        </div>
     </div>
 </div>
-<div class="dashboard-grid mt-4">
+<div class="dashboard-grid">
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">{{ _('Recherche d\'utilisateurs') }}</h5>

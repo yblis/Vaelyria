@@ -73,7 +73,7 @@
 
 <!-- OU Filter Modal -->
 <div class="modal fade" id="ouFilterModal" tabindex="-1" aria-labelledby="ouFilterModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg ou-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="ouFilterModalLabel">{{ _('Select Organizational Unit') }}</h5>
@@ -108,7 +108,63 @@
     {% endif %}
 </h3>
 
-<table class="table table-striped">
+<!-- Vue mobile en cartes -->
+<div class="user-cards-list">
+    {% for user in users %}
+    <div class="user-card" data-dn="{{ user.entry_dn }}">
+        <div class="user-card-header">
+            <div class="status-icon">
+                {% if ',OU=Corbeille,' in user.entry_dn %}
+                <i class="fas fa-trash text-danger" title="{{ _('In trash') }}"></i>
+                {% elif user.userAccountControl.value is defined and user.userAccountControl.value | int == 514 %}
+                <i class="fas fa-lock text-danger" title="{{ _('Account locked') }}"></i>
+                {% else %}
+                <i class="fas fa-lock-open text-success" title="{{ _('Account unlocked') }}"></i>
+                {% endif %}
+            </div>
+            <h4 class="user-name">{{ user.sn.value if user.sn is defined else '' }} {{ user.givenName.value if user.givenName is defined else '' }}</h4>
+        </div>
+        <div class="user-card-body">
+            <div>
+                <label>{{ _('Username') }}:</label>
+                {{ user.sAMAccountName.value if user.sAMAccountName is defined else '' }}
+            </div>
+            <div>
+                <label>{{ _('Email') }}:</label>
+                {{ user.mail.value if user.mail is defined else '' }}
+            </div>
+            <div>
+                <label>{{ _('OU') }}:</label>
+                {% set parts = user.entry_dn.split(',') %}{% set ou_parts = [] %}{% for part in parts %}{% if part.startswith('OU=') %}{% set _ = ou_parts.append(part[3:]) %}{% endif %}{% endfor %}/{{ ou_parts|reverse|join('/') }}/
+            </div>
+        </div>
+        <div class="user-card-footer">
+            <div class="user-card-actions">
+                <a href="{{ url_for('users.edit_user', dn=user.entry_dn) }}" class="btn btn-sm btn-primary" title="{{ _('View/Edit') }}"><i class="fas fa-edit"></i></a>
+                {% if ',OU=Corbeille,' not in user.entry_dn %}
+                <a href="#" class="btn btn-sm btn-danger trash-user" data-dn="{{ user.entry_dn }}" title="{{ _('Move to trash') }}"><i class="fas fa-trash-alt"></i></a>
+                {% endif %}
+                {% if user.userAccountControl.value is defined and user.userAccountControl.value | int == 514 %}
+                <a href="#" class="btn btn-sm btn-success unlock-user" data-dn="{{ user.entry_dn }}" title="{{ _('Unlock') }}"><i class="fas fa-unlock"></i></a>
+                {% else %}
+                <a href="#" class="btn btn-sm btn-warning lock-user" data-dn="{{ user.entry_dn }}" title="{{ _('Lock') }}"><i class="fas fa-lock"></i></a>
+                {% endif %}
+                {% if ',OU=Corbeille,' in user.entry_dn %}
+                <a href="#" class="btn btn-sm btn-success restore-user" data-dn="{{ user.entry_dn }}" title="{{ _('Restore') }}" data-bs-toggle="modal" data-bs-target="#restoreModal"><i class="fas fa-trash-restore"></i></a>
+                {% else %}
+                <a href="#" class="btn btn-sm btn-warning move-user" data-dn="{{ user.entry_dn }}" title="{{ _('Move') }}" data-bs-toggle="modal" data-bs-target="#restoreModal"><i class="fas fa-arrow-right"></i></a>
+                <button class="btn btn-sm btn-info reset-password-btn" title="{{ _('Reset password') }}" data-dn="{{ user.entry_dn }}" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                    <i class="fas fa-key"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Vue desktop en tableau -->
+<table class="table table-striped table-user-list">
     <thead>
         <tr>
             <th>{{ _('Status') }}</th>
@@ -234,7 +290,7 @@
 
 <!-- Restore Modal -->
 <div class="modal fade" id="restoreModal" tabindex="-1" aria-labelledby="restoreModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog ou-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="restoreModalLabel">{{ _('Restore User') }}</h5>

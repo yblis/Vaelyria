@@ -16,6 +16,42 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
+#: templates/user_edit.html:334
+msgid "Account Status"
+msgstr "Account Status"
+
+#: templates/user_edit.html:341
+msgid "Active account"
+msgstr "Active account"
+
+#: templates/user_edit.html:347
+msgid "Unlocked account"
+msgstr "Unlocked account (account locked)"
+
+#: templates/user_search.html:153
+msgid "Mettre a la corbeille"
+msgstr "Move to trash"
+
+#: templates/user_search.html:156
+msgid "Unlock"
+msgstr "Unlock"
+
+#: templates/user_search.html:158
+msgid "Lock"
+msgstr "Lock"
+
+#: templates/user_search.html:161
+msgid "Restore"
+msgstr "Restore"
+
+#: templates/user_search.html:163
+msgid "Move"
+msgstr "Move"
+
+#: templates/user_search.html:164
+msgid "Reset password"
+msgstr "Reset password"
+
 #: templates/base.html:37
 msgid "Users"
 msgstr "Users"

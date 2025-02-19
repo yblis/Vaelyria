@@ -2,7 +2,7 @@
 function updateOnlineStatus() {
     const indicator = document.createElement('div');
     indicator.className = 'offline-indicator';
-    indicator.textContent = 'Vous êtes hors ligne';
+    // indicator.textContent = 'Vous êtes hors ligne';
     document.body.appendChild(indicator);
 
     window.addEventListener('online', () => {

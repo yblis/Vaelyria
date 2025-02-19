@@ -2,8 +2,36 @@
 
 {% block content %}
 <h2>{{ _('Membres du groupe') }}</h2>
-<div class="table-responsive">
-    <table class="table table-striped table-mobile-stack">
+<!-- Vue mobile en cartes -->
+<div class="member-cards-list">
+    {% for member in members %}
+    <div class="member-card">
+        <div class="member-card-header">
+            <h4 class="member-name">{{ member.sn.value|default('N/A') }} {{ member.givenName.value|default('N/A') }}</h4>
+        </div>
+        <div class="member-card-body">
+            <div>
+                <label>{{ _('Nom d\'utilisateur') }}:</label>
+                {{ member.sAMAccountName.value|default('N/A') }}
+            </div>
+        </div>
+        <div class="member-card-footer">
+            <div class="member-card-actions">
+                <a href="{{ url_for('groups.remove_group_member', group_dn=group_dn, user_dn=member.entry_dn) }}" 
+                   class="btn btn-danger w-100" 
+                   onclick="return confirm('{{ _('Êtes-vous sûr de vouloir retirer cet utilisateur du groupe ?') }}')" 
+                   title="{{ _('Retirer') }}">
+                    <i class="fas fa-user-minus"></i> {{ _('Retirer') }}
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Vue desktop en tableau -->
+<div class="member-table-responsive">
+    <table class="table table-striped member-table-list">
         <thead>
             <tr>
                 <th>{{ _('Nom') }}</th>
@@ -19,14 +47,18 @@
                 <td>{{ member.givenName.value|default('N/A') }}</td>
                 <td>{{ member.sAMAccountName.value|default('N/A') }}</td>
                 <td>
-                <a href="{{ url_for('groups.remove_group_member', group_dn=group_dn, user_dn=member.entry_dn) }}" class="btn btn-sm btn-danger" onclick="return confirm('{{ _('Êtes-vous sûr de vouloir retirer cet utilisateur du groupe ?') }}')" title="{{ _('Retirer') }}">
-                    <i class="fas fa-user-minus"></i>
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    <a href="{{ url_for('groups.remove_group_member', group_dn=group_dn, user_dn=member.entry_dn) }}" 
+                       class="btn btn-sm btn-danger" 
+                       onclick="return confirm('{{ _('Êtes-vous sûr de vouloir retirer cet utilisateur du groupe ?') }}')" 
+                       title="{{ _('Retirer') }}">
+                        <i class="fas fa-user-minus"></i>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <h3>{{ _('Ajouter des membres') }}</h3>
 <div class="mb-4">
