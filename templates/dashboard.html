@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row text-center mb-4">
+    <div class="card">
+        <br>
+        <h3>{{ _('Bienvenue dans Vaelyria') }}</h3>
+        <p class="lead">{{ _('Gestion de l\'Active Directory') }}</p>
+    </div>
+</div>
+<div class="dashboard-grid mt-4">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ _('Recherche d\'utilisateurs') }}</h5>
+            <p class="card-text">{{ _('Recherchez et gérez les utilisateurs Active Directory.') }}</p>
+            <form action="{{ url_for('users.search') }}" method="GET" class="mb-2">
+                <input type="text" class="form-control mb-2" name="search_term" placeholder="{{ _('Recherche rapide (nom, utilisateur ou email)...') }}">
+            </form>
+            <a href="{{ url_for('users.search') }}" class="btn btn-primary">{{ _('Recherche avancée') }}</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ _('Création d\'utilisateur') }}</h5>
+            <p class="card-text">{{ _('Créez un nouvel utilisateur dans Active Directory.') }}</p>
+            <br><br>
+            <a href="{{ url_for('users.create') }}" class="btn btn-success">{{ _('Créer un utilisateur') }}</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ _('Gestion des groupes') }}</h5>
+            <p class="card-text">{{ _('Gérez les groupes et leurs membres.') }}</p>
+            <form action="{{ url_for('groups.list_groups') }}" method="GET" class="mb-2">
+                <input type="text" class="form-control mb-2" name="search" placeholder="{{ _('Recherche rapide...') }}">
+            </form>
+            <a href="{{ url_for('groups.list_groups') }}" class="btn btn-info">{{ _('Recherche avancée') }}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

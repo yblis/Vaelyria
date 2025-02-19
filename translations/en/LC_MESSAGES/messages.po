@@ -1,0 +1,840 @@
+# English translations for ADManager.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the ADManager project.
+msgid ""
+msgstr ""
+"Project-Id-Version: ADManager 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-16 19:12+0000\n"
+"PO-Revision-Date: 2025-02-16 14:31+0000\n"
+"Last-Translator: Djamal BOUSSEFSAF\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/base.html:37
+msgid "Users"
+msgstr "Users"
+
+#: templates/base.html:41
+msgid "Search"
+msgstr "Search"
+
+#: templates/base.html:44
+msgid "Create User"
+msgstr "Create User"
+
+#: templates/base.html:47
+msgid "Service Profiles"
+msgstr "Service Profiles"
+
+#: templates/base.html:55
+msgid "Groups"
+msgstr "Groups"
+
+#: templates/base.html:62
+msgid "Administration"
+msgstr "Administration"
+
+#: templates/base.html:66
+msgid "Statistics"
+msgstr "Statistics"
+
+#: templates/base.html:69
+msgid "Logs"
+msgstr "Logs"
+
+#: templates/base.html:72
+msgid "LDAP Settings"
+msgstr "LDAP Settings"
+
+#: templates/base.html:80
+msgid "Language"
+msgstr "Language (🇬🇧)"
+
+#: templates/base.html:91
+msgid "Logout"
+msgstr "Logout"
+
+#: templates/base.html:123
+msgid "You are offline"
+msgstr "You are offline"
+
+#: templates/base.html:130
+msgid "Service Worker successfully registered:"
+msgstr "Service Worker successfully registered:"
+
+#: templates/base.html:133
+msgid "Error registering Service Worker:"
+msgstr "Error registering Service Worker:"
+
+#: templates/dashboard.html:7
+msgid "Bienvenue dans Vaelyria"
+msgstr "Welcome to Vaelyria"
+
+#: templates/dashboard.html:8
+msgid "Gestion de l'Active Directory"
+msgstr "Active Directory Management"
+
+#: templates/dashboard.html:14
+msgid "Recherche d'utilisateurs"
+msgstr "User Search"
+
+#: templates/dashboard.html:15
+msgid "Recherchez et gérez les utilisateurs Active Directory."
+msgstr "Search and manage Active Directory users."
+
+#: templates/dashboard.html:17
+msgid "Recherche rapide (nom, utilisateur ou email)..."
+msgstr "Quick search (name, username or email)..."
+
+#: templates/dashboard.html:19 templates/dashboard.html:37
+msgid "Recherche avancée"
+msgstr "Advanced Search"
+
+#: templates/dashboard.html:24
+msgid "Création d'utilisateur"
+msgstr "Create User"
+
+#: templates/dashboard.html:25
+msgid "Créez un nouvel utilisateur dans Active Directory."
+msgstr "Create a new user in Active Directory."
+
+#: templates/dashboard.html:27
+msgid "Créer un utilisateur"
+msgstr "Create User"
+
+#: templates/dashboard.html:32 templates/group_management.html:5
+msgid "Gestion des groupes"
+msgstr "Group Management"
+
+#: templates/dashboard.html:33
+msgid "Gérez les groupes et leurs membres."
+msgstr "Manage groups and their members."
+
+#: templates/dashboard.html:35
+msgid "Recherche rapide..."
+msgstr "Quick search..."
+
+#: templates/group_management.html:9
+msgid "Rechercher des groupes..."
+msgstr "Search groups..."
+
+#: templates/group_management.html:13
+msgid "Tous les groupes"
+msgstr "All groups"
+
+#: templates/group_management.html:14
+msgid "Groupes de sécurité"
+msgstr "Security groups"
+
+#: templates/group_management.html:15
+msgid "Groupes de distribution"
+msgstr "Distribution groups"
+
+#: templates/group_management.html:22
+msgid "Créer un groupe"
+msgstr "Create group"
+
+#: templates/group_management.html:34
+msgid "Créer un nouveau groupe"
+msgstr "Create new group"
+
+#: templates/group_management.html:40 templates/group_management.html:109
+msgid "Nom du groupe"
+msgstr "Group name"
+
+#: templates/group_management.html:44
+msgid "Type de groupe"
+msgstr "Group type"
+
+#: templates/group_management.html:46
+msgid "Groupe de Sécurité"
+msgstr "Security Group"
+
+#: templates/group_management.html:47
+msgid "Groupe de Distribution"
+msgstr "Distribution Group"
+
+#: templates/group_management.html:51
+msgid "Étendue du groupe"
+msgstr "Group scope"
+
+#: templates/group_management.html:55
+msgid "Domaine local"
+msgstr "Domain local"
+
+#: templates/group_management.html:61
+msgid "Globale"
+msgstr "Global"
+
+#: templates/group_management.html:67
+msgid "Universel"
+msgstr "Universal"
+
+#: templates/group_management.html:72
+msgid "Emplacement du groupe"
+msgstr "Group location"
+
+#: templates/group_management.html:79 templates/group_management.html:99
+#: templates/group_management.html:378 templates/user_edit.html:457
+msgid "Annuler"
+msgstr "Cancel"
+
+#: templates/group_management.html:80
+msgid "Créer le groupe"
+msgstr "Create group"
+
+#: templates/group_management.html:91
+msgid "Confirmer la suppression"
+msgstr "Confirm deletion"
+
+#: templates/group_management.html:95
+msgid ""
+"Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action est "
+"irréversible."
+msgstr "Are you sure you want to delete this group? This action is irreversible."
+
+#: templates/group_management.html:100 templates/group_management.html:124
+#: templates/service_profiles_list.html:40
+msgid "Supprimer"
+msgstr "Delete"
+
+#: templates/group_management.html:110 templates/group_members.html:12
+#: templates/service_profiles_list.html:16
+msgid "Actions"
+msgstr "Actions"
+
+#: templates/group_management.html:118
+msgid "Voir les membres"
+msgstr "View members"
+
+#: templates/group_management.html:121 templates/group_management.html:379
+msgid "Exporter"
+msgstr "Export"
+
+#: templates/group_management.html:138
+#, python-format
+msgid "Affichage des groupes %(start)s-%(end)s sur %(total)s"
+msgstr "Showing groups %(start)s-%(end)s of %(total)s"
+
+#: templates/group_management.html:142
+msgid "Navigation des pages"
+msgstr "Page navigation"
+
+#: templates/group_management.html:146
+msgid "Précédent"
+msgstr "Previous"
+
+#: templates/group_management.html:165
+msgid "Suivant"
+msgstr "Next"
+
+#: templates/group_management.html:190
+msgid "Veuillez remplir tous les champs"
+msgstr "Please fill in all fields"
+
+#: templates/group_management.html:215 templates/group_management.html:219
+msgid "Une erreur est survenue lors de la création du groupe"
+msgstr "An error occurred while creating the group"
+
+#: templates/group_management.html:245 templates/group_management.html:249
+msgid "Une erreur est survenue lors de la suppression du groupe"
+msgstr "An error occurred while deleting the group"
+
+#: templates/group_management.html:283
+msgid "Sélectionner les attributs à exporter"
+msgstr "Select attributes to export"
+
+#: templates/group_management.html:293
+msgid "sn (Nom)"
+msgstr "sn (Last name)"
+
+#: templates/group_management.html:299
+msgid "givenName (Prénom)"
+msgstr "givenName (First name)"
+
+#: templates/group_management.html:305
+msgid "samAccountName (Utilisateur)"
+msgstr "samAccountName (Username)"
+
+#: templates/group_management.html:311
+msgid "mail (Adresse Mail)"
+msgstr "mail (Email address)"
+
+#: templates/group_management.html:317
+msgid "company (Entreprise)"
+msgstr "company (Company)"
+
+#: templates/group_management.html:323
+msgid "department (Service)"
+msgstr "department (Department)"
+
+#: templates/group_management.html:329
+msgid "distinguishedName (Identifiant Unique AD)"
+msgstr "distinguishedName (Unique AD Identifier)"
+
+#: templates/group_management.html:335
+msgid "employeeID (Matricule)"
+msgstr "employeeID (Employee ID)"
+
+#: templates/group_management.html:341
+msgid "ipPhone (Téléphone IP)"
+msgstr "ipPhone (IP Phone)"
+
+#: templates/group_management.html:347
+msgid "lastLogon (Dernière Connexion)"
+msgstr "lastLogon (Last Login)"
+
+#: templates/group_management.html:353
+msgid "manager (Responsable)"
+msgstr "manager (Manager)"
+
+#: templates/group_management.html:359
+msgid "mobile (Téléphone Mobile)"
+msgstr "mobile (Mobile Phone)"
+
+#: templates/group_management.html:365
+msgid "title (Poste)"
+msgstr "title (Position)"
+
+#: templates/group_management.html:371
+msgid "whenCreated (Date de Création du Compte)"
+msgstr "whenCreated (Account Creation Date)"
+
+#: templates/group_members.html:4
+msgid "Membres du groupe"
+msgstr "Group Members"
+
+#: templates/group_members.html:9
+msgid "Nom"
+msgstr "Last Name"
+
+#: templates/group_members.html:10 templates/user_create.html:50
+#: templates/user_edit.html:281
+msgid "Prénom"
+msgstr "First Name"
+
+#: templates/group_members.html:11
+msgid "Nom d'utilisateur"
+msgstr "Username"
+
+#: templates/group_members.html:22
+msgid "Êtes-vous sûr de vouloir retirer cet utilisateur du groupe ?"
+msgstr "Are you sure you want to remove this user from the group?"
+
+#: templates/group_members.html:22 templates/group_members.html:74
+msgid "Retirer"
+msgstr "Remove"
+
+#: templates/group_members.html:31
+msgid "Ajouter des membres"
+msgstr "Add members"
+
+#: templates/group_members.html:34
+msgid "Rechercher des utilisateurs..."
+msgstr "Search users..."
+
+#: templates/group_members.html:35
+msgid "Rechercher"
+msgstr "Search"
+
+#: templates/group_members.html:45
+msgid "Ajouter les membres sélectionnés"
+msgstr "Add selected members"
+
+#: templates/group_members.html:92
+msgid "Veuillez saisir au moins 3 caractères pour effectuer la recherche"
+msgstr "Please enter at least 3 characters to search"
+
+#: templates/group_members.html:97
+msgid "Recherche en cours..."
+msgstr "Searching..."
+
+#: templates/group_members.html:125
+msgid "Utilisateur:"
+msgstr "User:"
+
+#: templates/group_members.html:128
+msgid "Ajouter"
+msgstr "Add"
+
+#: templates/group_members.html:138
+msgid "Aucun utilisateur trouvé"
+msgstr "No users found"
+
+#: templates/group_members.html:144
+msgid "Erreur lors de la recherche. Veuillez réessayer."
+msgstr "Error while searching. Please try again."
+
+#: templates/service_profiles_create.html:9
+#, fuzzy
+msgid "New Service Profile"
+msgstr "Service Profiles"
+
+#: templates/service_profiles_create.html:14
+#, fuzzy
+msgid "Service Name"
+msgstr "Username"
+
+#: templates/service_profiles_create.html:16
+msgid "Example: \"IT Service\", \"Accounting\", \"HR\""
+msgstr ""
+
+#: templates/service_profiles_create.html:20
+msgid "Default Organizational Unit (OU)"
+msgstr ""
+
+#: templates/service_profiles_create.html:26
+#, fuzzy
+msgid "Active Directory Groups"
+msgstr "Active Directory Management"
+
+#: templates/service_profiles_create.html:32
+msgid "Hold Ctrl (Cmd on Mac) to select multiple groups"
+msgstr ""
+
+#: templates/service_profiles_create.html:35
+#, fuzzy
+msgid "Domain"
+msgstr "Domain local"
+
+#: templates/service_profiles_create.html:37
+msgid "Select a domain"
+msgstr ""
+
+#: templates/service_profiles_create.html:42
+msgid "Select the domain used by this profile"
+msgstr ""
+
+#: templates/service_profiles_create.html:46 templates/user_edit.html:318
+msgid "Manager"
+msgstr "Manager"
+
+#: templates/service_profiles_create.html:48
+#, fuzzy
+msgid "Select a manager"
+msgstr "Manager"
+
+#: templates/service_profiles_create.html:53
+msgid "Select an Active Directory manager for this profile"
+msgstr ""
+
+#: templates/service_profiles_create.html:56
+#, fuzzy
+msgid "Function"
+msgstr "Position"
+
+#: templates/service_profiles_create.html:58
+msgid "User function (title attribute)"
+msgstr ""
+
+#: templates/service_profiles_create.html:62
+#, fuzzy
+msgid "Department"
+msgstr "Department"
+
+#: templates/service_profiles_create.html:64
+#, fuzzy
+msgid "Department (department attribute)"
+msgstr "department (Department)"
+
+#: templates/service_profiles_create.html:68
+msgid "Company"
+msgstr ""
+
+#: templates/service_profiles_create.html:70
+#, fuzzy
+msgid "Company (company attribute)"
+msgstr "company (Company)"
+
+#: templates/service_profiles_create.html:76
+#, fuzzy
+msgid "IP Telephony"
+msgstr "IP Phone"
+
+#: templates/service_profiles_create.html:82
+msgid "User Attribute Transformation Rules"
+msgstr ""
+
+#: templates/service_profiles_create.html:86
+#, fuzzy
+msgid "sAMAccountName Suffix"
+msgstr "samAccountName (Username)"
+
+#: templates/service_profiles_create.html:88
+msgid "Ex: \".ext\" → jsmith.ext"
+msgstr ""
+
+#: templates/service_profiles_create.html:92
+msgid "Common Name Suffix"
+msgstr ""
+
+#: templates/service_profiles_create.html:94
+msgid "Ex: \" (External)\" → \"SMITH John (External)\" for cn, name, displayName"
+msgstr ""
+
+#: templates/service_profiles_create.html:98
+msgid "Given Name Suffix"
+msgstr ""
+
+#: templates/service_profiles_create.html:100
+msgid "Ex: \"_External\" → \"John_External\" for givenName"
+msgstr ""
+
+#: templates/service_profiles_create.html:104
+msgid "Email Suffix"
+msgstr ""
+
+#: templates/service_profiles_create.html:106
+msgid "Ex: \".ext\" → john.smith.ext@example.com for mail, userPrincipalName"
+msgstr ""
+
+#: templates/service_profiles_create.html:110
+msgid "Email Alias Suffix"
+msgstr ""
+
+#: templates/service_profiles_create.html:112
+msgid "Ex: \".ext\" → john.smith.ext for mailNickname"
+msgstr ""
+
+#: templates/service_profiles_create.html:116
+msgid "Proxy Addresses Suffix"
+msgstr ""
+
+#: templates/service_profiles_create.html:118
+#: templates/service_profiles_create.html:124
+msgid "Ex: \".ext\" → SMTP:john.smith.ext@example.com"
+msgstr ""
+
+#: templates/service_profiles_create.html:122
+msgid "Target Address Suffix"
+msgstr ""
+
+#: templates/service_profiles_create.html:130
+msgid "Additional Parameters"
+msgstr ""
+
+#: templates/service_profiles_create.html:133
+msgid ""
+"JSON format accepted for parameters like account expiration, home "
+"directory, etc."
+msgstr ""
+
+#: templates/service_profiles_create.html:140
+msgid "Cancel"
+msgstr ""
+
+#: templates/service_profiles_create.html:143
+#, fuzzy
+msgid "Create Profile"
+msgstr "Service Profiles"
+
+#: templates/service_profiles_create.html:198
+msgid "Invalid JSON format for additional parameters."
+msgstr ""
+
+#: templates/service_profiles_list.html:6
+msgid "Profils de Service"
+msgstr "Service Profiles"
+
+#: templates/service_profiles_list.html:8
+msgid "Nouveau Profil"
+msgstr "New Profile"
+
+#: templates/service_profiles_list.html:17
+msgid "Nom du Service"
+msgstr "Service Name"
+
+#: templates/service_profiles_list.html:18
+msgid "OU par défaut"
+msgstr "Default OU"
+
+#: templates/service_profiles_list.html:27
+msgid "Modifier"
+msgstr "Edit"
+
+#: templates/service_profiles_list.html:32
+msgid "Dupliquer"
+msgstr "Duplicate"
+
+#: templates/service_profiles_list.html:39
+msgid "Êtes-vous sûr de vouloir supprimer ce profil ?"
+msgstr "Are you sure you want to delete this profile?"
+
+#: templates/service_profiles_list.html:56
+msgid "Aucun profil de service n'a encore été créé."
+msgstr "No service profiles have been created yet."
+
+#: templates/service_profiles_list.html:57
+msgid "Créer un nouveau profil"
+msgstr "Create a new profile"
+
+#: templates/user_create.html:4
+msgid "Création d'un utilisateur"
+msgstr "Create User"
+
+#: templates/user_create.html:8
+msgid "Informations de l'utilisateur"
+msgstr "User Information"
+
+#: templates/user_create.html:15
+msgid "Profil de Service"
+msgstr "Service Profile"
+
+#: templates/user_create.html:17
+msgid "Sélectionner un profil..."
+msgstr "Select a profile..."
+
+#: templates/user_create.html:35
+msgid ""
+"Le profil de service définit la fonction, le service, et les paramètres "
+"de téléphonie"
+msgstr ""
+"The service profile defines the function, department, and telephony "
+"settings"
+
+#: templates/user_create.html:44
+msgid "NOM"
+msgstr "LAST NAME"
+
+#: templates/user_create.html:107
+msgid "Date d'expiration du compte"
+msgstr "Account expiration date"
+
+#: templates/user_edit.html:419
+msgid "Date d'expiration"
+msgstr "Expiration date"
+
+#: templates/user_edit.html:420
+msgid "Désactiver l'expiration"
+msgstr "Disable expiration"
+
+#: templates/user_create.html:108 templates/user_edit.html:421
+msgid "Optionnel - Pour les comptes stagiaires, consultants, prestataires"
+msgstr "Optional - For trainee, consultant and contractor accounts"
+
+#: templates/auth/login.html:23 templates/user_create.html:62
+msgid "Username"
+msgstr "Username"
+
+#: templates/user_create.html:71
+msgid "Généré automatiquement à partir du nom et prénom"
+msgstr "Automatically generated from first and last name"
+
+#: templates/user_create.html:79
+msgid "Créer l'utilisateur"
+msgstr "Create user"
+
+
+#: templates/user_create.html:202
+msgid "Erreur lors de la récupération de la configuration:"
+msgstr "Error retrieving configuration:"
+
+#: templates/user_create.html:222 templates/user_create.html:262
+msgid "Le username existe déjà dans l'AD"
+msgstr "Username already exists in AD"
+
+#: templates/user_create.html:229 templates/user_create.html:270
+msgid "Erreur lors de la vérification du username"
+msgstr "Error checking username"
+
+#: templates/user_create.html:265
+msgid "Le username est disponible."
+msgstr "Username is available."
+
+#: templates/user_edit.html:67
+msgid "Erreur lors de l'ajout au groupe:"
+msgstr "Error adding to group:"
+
+#: templates/user_edit.html:71
+msgid "Erreur lors de l'ajout au groupe"
+msgstr "Error adding to group"
+
+#: templates/user_edit.html:88
+msgid "Erreur lors du retrait du groupe:"
+msgstr "Error removing from group:"
+
+#: templates/user_edit.html:92
+msgid "Erreur lors du retrait du groupe"
+msgstr "Error removing from group"
+
+#: templates/user_edit.html:143
+msgid "Erreur lors de la recherche:"
+msgstr "Error while searching:"
+
+#: templates/user_edit.html:174
+msgid "Erreur lors de la suppression:"
+msgstr "Error while deleting:"
+
+#: templates/user_edit.html:179
+msgid "Erreur lors de la suppression de l'utilisateur"
+msgstr "Error deleting user"
+
+#: templates/user_edit.html:189
+msgid "Conteneur de l'arbre non trouvé!"
+msgstr "Tree container not found!"
+
+#: templates/user_edit.html:205
+msgid "Erreur lors du chargement de l'arbre:"
+msgstr "Error loading tree:"
+
+#: templates/user_edit.html:206
+msgid "Erreur lors du chargement de l'arborescence:"
+msgstr "Error loading tree structure:"
+
+#: templates/user_edit.html:238
+msgid "Échec de l'initialisation de jstree"
+msgstr "Failed to initialize jstree"
+
+#: templates/user_edit.html:239
+msgid "Erreur d'initialisation de l'arborescence"
+msgstr "Error initializing tree structure"
+
+#: templates/user_edit.html:263
+msgid "Modifier l'utilisateur"
+msgstr "Edit user"
+
+#: templates/user_edit.html:273
+msgid "Informations personnelles"
+msgstr "Personal Information"
+
+#: templates/user_edit.html:277
+msgid "Nom de famille"
+msgstr "Last name"
+
+#: templates/user_edit.html:285
+msgid "Nom complet"
+msgstr "Full name"
+
+#: templates/auth/login.html:10 templates/user_edit.html:289
+msgid "Login"
+msgstr "Login"
+
+#: templates/user_edit.html:293
+msgid "Email"
+msgstr "Email"
+
+#: templates/user_edit.html:302
+msgid "Informations professionnelles"
+msgstr "Professional Information"
+
+#: templates/user_edit.html:306
+msgid "Société"
+msgstr "Company"
+
+#: templates/user_edit.html:310
+msgid "Département"
+msgstr "Department"
+
+#: templates/user_edit.html:314
+msgid "Fonction"
+msgstr "Position"
+
+#: templates/user_edit.html:320
+msgid "Rechercher un manager..."
+msgstr "Search for a manager..."
+
+#: templates/user_edit.html:334
+msgid "État du compte"
+msgstr "Account Status"
+
+#: templates/user_edit.html:341
+msgid "Compte actif"
+msgstr "Active account"
+
+#: templates/user_edit.html:347
+msgid "Compte déverrouillé"
+msgstr "Unlocked account"
+
+#: templates/user_edit.html:357
+msgid "Informations système"
+msgstr "System Information"
+
+#: templates/user_edit.html:361
+msgid "Emplacement"
+msgstr "Location"
+
+#: templates/user_edit.html:366
+msgid "Date de création"
+msgstr "Creation date"
+
+#: templates/user_edit.html:370
+msgid "Dernière connexion"
+msgstr "Last login"
+
+#: templates/user_edit.html:379
+msgid "Groupes"
+msgstr "Groups"
+
+#: templates/user_edit.html:383
+msgid "Groupes de l'utilisateur"
+msgstr "User groups"
+
+#: templates/user_edit.html:385
+msgid "Sélectionner un groupe à ajouter..."
+msgstr "Select a group to add..."
+
+#: templates/user_edit.html:391
+msgid "Ajouter au groupe"
+msgstr "Add to group"
+
+#: templates/user_edit.html:410
+msgid "Contact"
+msgstr "Contact"
+
+#: templates/user_edit.html:414
+msgid "Mobile"
+msgstr "Mobile"
+
+#: templates/user_edit.html:418
+msgid "IP Phone"
+msgstr "IP Phone"
+
+#: templates/user_edit.html:427 templates/user_edit.html:435
+msgid "Supprimer l'utilisateur"
+msgstr "Delete user"
+
+#: templates/user_edit.html:432
+msgid "Attention, cette opération est irréversible."
+msgstr "Warning, this operation is irreversible."
+
+#: templates/user_edit.html:447
+msgid "Confirmation de suppression"
+msgstr "Delete confirmation"
+
+#: templates/user_edit.html:452
+msgid "Êtes-vous sûr de vouloir supprimer cet utilisateur ?"
+msgstr "Are you sure you want to delete this user?"
+
+#: templates/user_edit.html:453
+msgid "Cette action est irréversible !"
+msgstr "This action is irreversible!"
+
+#: templates/user_edit.html:460
+msgid "Supprimer définitivement"
+msgstr "Delete permanently"
+
+#: templates/user_edit.html:472
+msgid "Enregistrer les modifications"
+msgstr "Save changes"
+
+#: templates/user_edit.html:419 templates/user_create.html:107
+msgid "Date d'expiration"
+msgstr "Expiration date"
+
+#: templates/user_edit.html:420
+msgid "Désactiver l'expiration"
+msgstr "Disable expiration"
+
+#: templates/auth/login.html:28
+msgid "Password"
+msgstr "Password"
+
+#: templates/auth/login.html:34
+msgid "Sign in"
+msgstr "Sign in"

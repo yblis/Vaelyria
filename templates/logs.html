@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card p-4 mb-4">
+        <h2>{{ _('Audit Logs') }}</h2>
+        <!-- Filters -->
+        <form class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="days">{{ _('Period') }}</label>
+                        <select name="days" id="days" class="form-control" onchange="this.form.submit()">
+                            <option value="1" {% if current_days == 1 %}selected{% endif %}>{{ _('Last 24 hours') }}</option>
+                            <option value="7" {% if current_days == 7 %}selected{% endif %}>{{ _('Last 7 days') }}</option>
+                            <option value="30" {% if current_days == 30 %}selected{% endif %}>{{ _('Last 30 days') }}</option>
+                            <option value="0" {% if current_days == 0 %}selected{% endif %}>{{ _('All history') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="level">{{ _('Level') }}</label>
+                        <select name="level" id="level" class="form-control" onchange="this.form.submit()">
+                            <option value="all" {% if current_level == 'all' %}selected{% endif %}>{{ _('All levels') }}</option>
+                            <option value="info" {% if current_level == 'info' %}selected{% endif %}>{{ _('Info') }}</option>
+                            <option value="warning" {% if current_level == 'warning' %}selected{% endif %}>{{ _('Warning') }}</option>
+                            <option value="error" {% if current_level == 'error' %}selected{% endif %}>{{ _('Error') }}</option>
+                            <option value="critical" {% if current_level == 'critical' %}selected{% endif %}>{{ _('Critical') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="action">{{ _('Action Type') }}</label>
+                        <select name="action" id="action" class="form-control" onchange="this.form.submit()">
+                            <option value="all" {% if current_action == 'all' %}selected{% endif %}>{{ _('All actions') }}</option>
+                            {% for action in available_actions %}
+                            <option value="{{ action }}" {% if current_action == action %}selected{% endif %}>{{ action }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="user">{{ _('User') }}</label>
+                        <input type="text" name="user" id="user" class="form-control" value="{{ current_user }}" placeholder="{{ _('Filter by user') }}">
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Export button -->
+        <form action="{{ url_for('logs.export_logs') }}" method="post" class="mt-3" data-export-form>
+            <input type="hidden" name="days" value="{{ current_days }}">
+            <input type="hidden" name="level" value="{{ current_level }}">
+            <input type="hidden" name="action" value="{{ current_action }}">
+            <input type="hidden" name="user" value="{{ current_user }}">
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-file-excel me-2"></i>{{ _('Export to Excel') }}
+            </button>
+        </form>
+    </div>
+    <!-- Logs table -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>{{ _('Date') }}</th>
+                    <th>{{ _('User') }}</th>
+                    <th>{{ _('Action') }}</th>
+                    <th>{{ _('Details') }}</th>
+                    <th>{{ _('Level') }}</th>
+                    <th>{{ _('IP') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs.items %}
+                <tr class="{{ 'table-warning' if log.level == 'WARNING' else 'table-danger' if log.level in ['ERROR', 'CRITICAL'] else '' }}">
+                    <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ log.user }}</td>
+                    <td>{{ _(log.action) }}</td>
+                    <td style="max-width: 300px; overflow-wrap: break-word;">{{ log.details }}</td>
+                    <td><span class="badge {{ 'bg-warning' if log.level == 'WARNING' else 'bg-danger' if log.level in ['ERROR', 'CRITICAL'] else 'bg-info' }}">{{ _(log.level) }}</span></td>
+                    <td>{{ log.ip_address }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if logs.pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if logs.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('logs.view_logs', page=logs.prev_num, days=current_days, level=current_level, action=current_action, user=current_user) }}">{{ _('Previous') }}</a>
+            </li>
+            {% endif %}
+
+            {% for page_num in logs.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                {% if page_num %}
+                    <li class="page-item {% if page_num == logs.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('logs.view_logs', page=page_num, days=current_days, level=current_level, action=current_action, user=current_user) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if logs.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('logs.view_logs', page=logs.next_num, days=current_days, level=current_level, action=current_action, user=current_user) }}">{{ _('Next') }}</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/export.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,72 @@
+.ldap-tree {
+    padding: 15px;
+}
+
+.ldap-node {
+    padding: 3px 0;
+}
+
+.node-content {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.node-content:hover {
+    background-color: #f5f5f5;
+}
+
+.toggle-icon {
+    width: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.toggle-icon-placeholder {
+    width: 20px;
+}
+
+.node-name {
+    margin-left: 5px;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.node-name.selected {
+    background-color: #e3f2fd;
+}
+
+.children {
+    margin-left: 20px;
+}
+
+/* Context Menu Styles */
+.ldap-context-menu {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    min-width: 150px;
+    z-index: 99999;
+    isolation: isolate;
+}
+
+.context-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.context-menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.context-menu-item i {
+    width: 16px;
+    text-align: center;
+}

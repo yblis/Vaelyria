@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ _('Profils de Service') }}</h2>
+        <a href="{{ url_for('service_profiles.create_profile') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> {{ _('Nouveau Profil') }}
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>{{ _('Actions') }}</th>
+                    <th>{{ _('Nom du Service') }}</th>
+                    <th>{{ _('OU par défaut') }}</th>
+                </tr>
+            </thead>
+            <tbody id="profiles-table">
+                {% for profile in profiles %}
+                <tr id="profile-{{ profile.id }}" draggable="true">
+                    <td>
+                        <div class="btn-group">
+                            <a href="{{ url_for('service_profiles.edit_profile', profile_id=profile.id) }}" 
+                               class="btn btn-sm btn-outline-primary" title="{{ _('Modifier') }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('service_profiles.duplicate_profile', profile_id=profile.id) }}"
+                                  method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="{{ _('Dupliquer') }}">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </form>
+                            <form action="{{ url_for('service_profiles.remove_profile', profile_id=profile.id) }}" 
+                                  method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                        onclick="return confirm('{{ _('Êtes-vous sûr de vouloir supprimer ce profil ?') }}')" 
+                                        title="{{ _('Supprimer') }}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                    <td>{{ profile.name }}</td>
+                    <td>{{ profile.ou }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if not profiles %}
+    <div class="alert alert-info">
+        {{ _('Aucun profil de service n\'a encore été créé.') }}
+        <a href="{{ url_for('service_profiles.create_profile') }}">{{ _('Créer un nouveau profil') }}</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/service_profiles.js') }}"></script>
+{% endblock %}

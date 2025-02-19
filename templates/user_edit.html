@@ -1,0 +1,519 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css">
+<style>
+    .tree-container {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        background-color: #fff;
+    }
+    .jstree-default .jstree-themeicon-custom {
+        background-size: contain !important;
+    }
+    .jstree-default .jstree-clicked {
+        background: #e3f2fd;
+    }
+    .jstree-default .jstree-hovered {
+        background: #f8f9fa;
+    }
+    .form-label {
+        font-weight: 500;
+    }
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+        font-weight: 600;
+    }
+    .section-icon {
+        color: #6c757d;
+        margin-right: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.15/jstree.min.js"></script>
+<script type="text/javascript">
+$(function() {
+    // Gestion des groupes
+    $('#addToGroup').on('click', function() {
+        var groupDN = $('#groupToAdd').val();
+        if (!groupDN) return;
+
+        $.post('{{ url_for("users.add_to_group", dn=user.entry_dn) }}', {
+            group_dn: groupDN
+        })
+        .done(function(response) {
+            if (response.success) {
+                var groupName = $('#groupToAdd option:selected').text();
+                $('#userGroups').append(`
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        ${groupName}
+                        <button type="button" class="btn btn-danger btn-sm remove-from-group" data-group-dn="${groupDN}">
+                            <i class="fas fa-user-minus"></i>
+                        </button>
+                    </div>
+                `);
+                $('#groupToAdd option:selected').remove();
+            } else {
+                alert('{{ _("Erreur lors de l\'ajout au groupe:") }}' + response.error);
+            }
+        })
+        .fail(function() {
+            alert('{{ _("Erreur lors de l\'ajout au groupe") }}');
+        });
+    });
+
+    $(document).on('click', '.remove-from-group', function() {
+        var button = $(this);
+        var groupDN = button.data('group-dn');
+        var groupName = button.parent().text().trim();
+
+        $.post('{{ url_for("users.remove_from_group", dn=user.entry_dn) }}', {
+            group_dn: groupDN
+        })
+        .done(function(response) {
+            if (response.success) {
+                $('#groupToAdd').append(new Option(groupName, groupDN));
+                button.parent().remove();
+            } else {
+                alert('{{ _("Erreur lors du retrait du groupe:") }}' + response.error);
+            }
+        })
+        .fail(function() {
+            alert('{{ _("Erreur lors du retrait du groupe") }}');
+        });
+    });
+
+    // Manager search functionality
+    var $managerSearch = $('#managerSearch');
+    var $managerResults = $('#managerResults');
+    var $managerInput = $('#manager');
+    var searchTimeout;
+
+    // Initialize manager search field with DN if manager exists
+    if ($managerInput.val()) {
+        var managerDN = $managerInput.val();
+        $managerSearch.val(managerDN);
+    }
+
+    $managerSearch.on('input', function() {
+        var query = $(this).val().trim();
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // Hide results if query is empty
+        if (!query) {
+            $managerResults.addClass('d-none').empty();
+            return;
+        }
+
+        // Set new timeout for search
+        searchTimeout = setTimeout(function() {
+            if (query.length >= 2) {
+                $.get('{{ url_for("api.search_users") }}', { q: query })
+                    .done(function(data) {
+                        $managerResults.empty();
+                        
+                        if (data.length > 0) {
+                            data.forEach(function(user) {
+                                $managerResults.append(
+                                    $('<button>')
+                                        .addClass('list-group-item list-group-item-action')
+                                        .text(user.displayName)
+                                        .attr('type', 'button')
+                                        .data('dn', user.dn)
+                                );
+                            });
+                            $managerResults.removeClass('d-none');
+                        } else {
+                            $managerResults.addClass('d-none');
+                        }
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        console.error('{{ _("Erreur lors de la recherche:") }}', textStatus, errorThrown);
+                    });
+            }
+        }, 300);
+    });
+
+    // Handle manager selection
+    $managerResults.on('click', 'button', function() {
+        var selectedDN = $(this).data('dn');
+        
+        $managerSearch.val(selectedDN);
+        $managerInput.val(selectedDN);
+        $managerResults.addClass('d-none');
+    });
+
+    // Hide results when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.input-group').length) {
+            $managerResults.addClass('d-none');
+        }
+    });
+
+    // Gestion de la suppression
+    $('#confirmDeleteUser').on('click', function() {
+        $.ajax({
+            url: '{{ url_for("users.delete_user", dn=user.entry_dn) }}',
+            method: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    window.location.href = '{{ url_for("users.search") }}';
+                } else {
+                    alert('{{ _("Erreur lors de la suppression:") }} ' + response.error);
+                    $('#deleteUserModal').modal('hide');
+                }
+            },
+            error: function() {
+                alert('{{ _("Erreur lors de la suppression de l\'utilisateur") }}');
+                $('#deleteUserModal').modal('hide');
+            }
+        });
+    });
+
+    var currentDN = "{{ user.entry_dn }}";
+    var $treeDiv = $('#ldap-tree');
+    
+    if (!$treeDiv.length) {
+        console.error('{{ _("Conteneur de l\'arbre non trouvé!") }}');
+        return;
+    }
+
+    $treeDiv.jstree({
+        core: {
+            animation: 100,
+            data: {
+                url: '{{ url_for("users.get_ldap_tree") }}',
+                data: function() {
+                    return { 'user_dn': currentDN };
+                },
+                type: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('{{ _("Erreur lors du chargement de l\'arbre:") }}', textStatus, errorThrown);
+                    $treeDiv.html('<div class="alert alert-danger">{{ _("Erreur lors du chargement de l\'arborescence:") }} ' + textStatus + '</div>');
+                }
+            },
+            themes: {
+                name: 'default',
+                dots: true,
+                icons: true,
+                variant: 'large',
+                stripes: false,
+                responsive: true
+            },
+            multiple: false,
+            expand_selected_onload: true,
+            check_callback: true
+        },
+        plugins: ['types', 'wholerow', 'state', 'changed'],
+        types: {
+            root: {
+                icon: 'fas fa-server text-info',
+                valid_children: ['ou']
+            },
+            ou: {
+                icon: 'fas fa-folder text-warning',
+                valid_children: ['ou']
+            }
+        },
+        state: { 
+            key: 'ldap_tree_state'
+        }
+    }).on('ready.jstree', function(e, data) {
+        var treeInstance = $(this).jstree(true);
+        if (!treeInstance) {
+            console.error('{{ _("Échec de l\'initialisation de jstree") }}');
+            $treeDiv.html('<div class="alert alert-danger">{{ _("Erreur d\'initialisation de l\'arborescence") }}</div>');
+            return;
+        }
+
+        // Trouver et sélectionner l'OU actuelle
+        var parts = currentDN.split(',');
+        var target = parts.slice(1).join(','); // Enlever le CN et garder le reste
+        
+        setTimeout(function() {
+            var node = treeInstance.get_node(target);
+            if (node) {
+                treeInstance.select_node(node);
+            }
+        }, 100);
+    }).on('select_node.jstree', function(e, data) {
+        $('#selectedOU').val(data.node.id);
+    });
+
+    // Handle account expiration
+    $('#disable_expiration').on('click', function() {
+        $('#expiration_date').val('');
+        $('<input>').attr({
+            type: 'hidden',
+            name: 'disable_expiration',
+            value: 'true'
+        }).appendTo('form');
+    });
+
+    // Date format validation
+    $('#expiration_date').on('input', function() {
+        let value = this.value;
+        if (value) {
+            const pattern = /^(\d{2})-(\d{2})-(\d{4})$/;
+            if (!pattern.test(value)) {
+                $(this).addClass('is-invalid');
+            } else {
+                const [_, day, month, year] = pattern.exec(value);
+                const date = new Date(year, month - 1, day);
+                const isValid = date.getDate() == day && date.getMonth() == month - 1 && date.getFullYear() == year;
+                $(this).toggleClass('is-invalid', !isValid);
+            }
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-user-edit me-2 text-primary"></i>{{ _('Modifier l\'utilisateur') }}</h2>
+    </div>
+
+    <form method="POST">
+        <!-- Section principale -->
+        <div class="row g-4">
+            <!-- Colonne principale (plus large) -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-user section-icon"></i>{{ _('Informations personnelles') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="sn" class="form-label"><i class="fas fa-user me-2"></i>{{ _('Nom de famille') }}</label>
+                            <input type="text" class="form-control" id="sn" name="sn" value="{{ user.attrs.sn }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="givenName" class="form-label"><i class="fas fa-user me-2"></i>{{ _('Prénom') }}</label>
+                            <input type="text" class="form-control" id="givenName" name="givenName" value="{{ user.attrs.givenName }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="displayName" class="form-label"><i class="fas fa-id-card me-2"></i>{{ _('Nom complet') }}</label>
+                            <input type="text" class="form-control" id="displayName" name="displayName" value="{{ user.attrs.displayName }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="samAccountName" class="form-label"><i class="fas fa-sign-in-alt me-2"></i>{{ _('Login') }}</label>
+                            <input type="text" class="form-control" id="samAccountName" name="samAccountName" value="{{ user.attrs.sAMAccountName }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="mail" class="form-label"><i class="fas fa-envelope me-2"></i>{{ _('Email') }}</label>
+                            <input type="email" class="form-control" id="mail" name="mail" value="{{ user.attrs.mail }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informations professionnelles -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-building section-icon"></i>{{ _('Informations professionnelles') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="company" class="form-label"><i class="fas fa-building me-2"></i>{{ _('Société') }}</label>
+                            <input type="text" class="form-control" id="company" name="company" value="{{ user.attrs.company }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="department" class="form-label"><i class="fas fa-sitemap me-2"></i>{{ _('Département') }}</label>
+                            <input type="text" class="form-control" id="department" name="department" value="{{ user.attrs.department }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="title" class="form-label"><i class="fas fa-briefcase me-2"></i>{{ _('Fonction') }}</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ user.attrs.title }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="manager" class="form-label"><i class="fas fa-user-tie me-2"></i>{{ _('Manager') }}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="managerSearch" placeholder="{{ _('Rechercher un manager...') }}" autocomplete="off">
+                                <input type="hidden" id="manager" name="manager" value="{{ user.attrs.manager if user.attrs.manager else '' }}">
+                            </div>
+                            <div id="managerResults" class="list-group position-absolute w-100 d-none" style="z-index: 1000;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne secondaire (moins large) -->
+            <div class="col-md-4">
+                <!-- État du compte -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-user-shield section-icon"></i>{{ _('État du compte') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column gap-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="accountActive" name="accountActive" {% if user.attrs.userAccountControl and user.attrs.userAccountControl != '514' and user.attrs.userAccountControl != 514 %}checked{% endif %}>
+                                <label class="form-check-label" for="accountActive">
+                                    <i class="fas fa-toggle-on me-2"></i>{{ _('Compte actif') }}
+                                </label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="accountLocked" name="accountLocked" {% if not user.lockoutTime or not user.lockoutTime.value %}checked{% endif %}>
+                                <label class="form-check-label" for="accountLocked">
+                                    <i class="fas fa-lock-open me-2"></i>{{ _('Compte déverrouillé') }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations système -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-server section-icon"></i>{{ _('Informations système') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="userOU" class="form-label"><i class="fas fa-sitemap me-2"></i>{{ _('Emplacement') }}</label>
+                            <div id="ldap-tree" class="tree-container mb-2"></div>
+                            <input type="hidden" id="selectedOU" name="selectedOU" value="{{ user.entry_dn }}">
+                        </div>
+                        {% if user.attrs.accountExpires and user.attrs.accountExpires not in ['9223372036854775807', '9999-12-31 23:59:59.999999+00:00'] and user.attrs.accountExpires|string != '9999-12-31 23:59:59.999999+00:00' %}
+                        <div class="mb-3">
+                            <label for="expiration_date" class="form-label"><i class="fas fa-calendar-times me-2"></i>{{ _("Date d'expiration") }}</label>
+                            <input type="text" class="form-control" id="expiration_date" name="expiration_date" 
+                                   value="{{ user.attrs.accountExpires }}"
+                                   placeholder="DD-MM-YYYY" pattern="\d{2}-\d{2}-\d{4}">
+                            <small class="form-text text-muted mb-2 d-block">{{ _('Optionnel - Pour les comptes stagiaires, consultants, prestataires') }}</small>
+                            <button class="btn btn-warning mt-2 w-100" type="button" id="disable_expiration">
+                                <i class="fas fa-infinity me-2"></i>{{ _("Désactiver l'expiration") }}
+                            </button>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="whenCreated" class="form-label"><i class="fas fa-calendar-plus me-2"></i>{{ _('Date de création') }}</label>
+                            <input type="text" class="form-control bg-light" id="whenCreated" name="whenCreated" value="{{ user.attrs.whenCreated }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastLogon" class="form-label"><i class="fas fa-clock me-2"></i>{{ _('Dernière connexion') }}</label>
+                            <input type="text" class="form-control bg-light" id="lastLogon" name="lastLogon" value="{{ user.attrs.lastLogon }}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Groupes -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-users section-icon"></i>{{ _('Groupes') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-layer-group me-2"></i>{{ _('Groupes de l\'utilisateur') }}</label>
+                            <select class="form-select mb-2" id="groupToAdd" name="groupToAdd">
+                                <option value="">{{ _('Sélectionner un groupe à ajouter...') }}</option>
+                                {% for dn, name in groups.items() %}
+                                <option value="{{ dn }}">{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="button" class="btn btn-success mb-3" id="addToGroup">
+                                <i class="fas fa-user-plus me-2"></i>{{ _('Ajouter au groupe') }}
+                            </button>
+                            <div class="list-group" id="userGroups">
+                                {% for group in user_groups %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ group.name }}
+                                    <button type="button" class="btn btn-danger btn-sm remove-from-group" data-group-dn="{{ group.dn }}">
+                                        <i class="fas fa-user-minus"></i>
+                                    </button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-address-book section-icon"></i>{{ _('Contact') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="mobile" class="form-label"><i class="fas fa-mobile-alt me-2"></i>{{ _('Mobile') }}</label>
+                            <input type="text" class="form-control" id="mobile" name="mobile" value="{{ user.attrs.mobile }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="ipPhone" class="form-label"><i class="fas fa-phone me-2"></i>{{ _('IP Phone') }}</label>
+                            <input type="text" class="form-control" id="ipPhone" name="ipPhone" value="{{ user.attrs.ipPhone }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supprimer l'utilisateur -->
+                <div class="card mb-4 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <i class="fas fa-trash section-icon"></i>{{ _('Supprimer l\'utilisateur') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {{ _('Attention, cette opération est irréversible.') }}
+                        </div>
+                        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                            <i class="fas fa-trash me-2"></i>{{ _('Supprimer l\'utilisateur') }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal de confirmation -->
+                <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title" id="deleteUserModalLabel">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    {{ _('Confirmation de suppression') }}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>{{ _('Êtes-vous sûr de vouloir supprimer cet utilisateur ?') }}</p>
+                                <p class="fw-bold">{{ _('Cette action est irréversible !') }}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>{{ _('Annuler') }}
+                                </button>
+                                <button type="button" class="btn btn-danger" id="confirmDeleteUser">
+                                    <i class="fas fa-trash me-2"></i>{{ _('Supprimer définitivement') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 text-center my-4">
+                <button type="submit" class="btn btn-primary btn-lg px-5">
+                    <i class="fas fa-save me-2"></i>{{ _('Enregistrer les modifications') }}
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

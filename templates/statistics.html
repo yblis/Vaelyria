@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Container principal -->
+<div class="container-fluid py-4">
+{% with %}
+{% if not stats %}
+    {% set stats = {
+        'users': {'total_users': 0, 'active_users': 0, 'inactive_users': 0, 'disabled_users': 0, 'expired_users': 0, 'ou_distribution': {}},
+        'groups': {'total_groups': 0, 'security_groups': 0, 'distribution_groups': 0, 'avg_members': 0, 'empty_groups': 0, 'top_groups': []},
+        'security': {'expired_passwords': 0, 'never_changed_password': 0, 'sensitive_groups': {}, 'admin_ou_distribution': {}, 'high_risk_users': []},
+        'activity': {'recent_logins': [], 'recent_password_changes': [], 'locked_accounts': {'weekly': 0, 'monthly': 0}, 'recent_creations': []}
+    } %}
+{% endif %}
+    <!-- Section 1: Overview -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h3 class="mb-0">{{ _('Overview') }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">{{ _('User Statistics') }}</h5>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <div class="mb-4">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">{{ _('Total number of users:') }} <strong>{{ stats.users.total_users or 0 }}</strong></li>
+                                    <li class="mb-2">{{ _('Active users:') }} <strong>{{ stats.users.active_users or 0 }}</strong></li>
+                                    <li class="mb-2">{{ _('Inactive users:') }} <strong>{{ stats.users.inactive_users or 0 }}</strong></li>
+                                    <li class="mb-2">{{ _('Disabled accounts:') }} <strong>{{ stats.users.disabled_users or 0 }}</strong></li>
+                                    <li class="mb-0">{{ _('Expired accounts:') }} <strong>{{ stats.users.expired_users or 0 }}</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">{{ _('Group Statistics') }}</h5>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <div class="mb-4">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">{{ _('Total number of groups:') }} <strong>{{ stats.groups.total_groups or 0 }}</strong></li>
+                                    <li class="mb-2">{{ _('Security groups:') }} <strong>{{ stats.groups.security_groups or 0 }}</strong></li>
+                                    <li class="mb-2">{{ _('Distribution groups:') }} <strong>{{ stats.groups.distribution_groups or 0 }}</strong></li>
+                                    <li class="mb-2">{{ _('Average members:') }} <strong>{{ "%.2f"|format(stats.groups.avg_members or 0) }}</strong></li>
+                                    <li class="mb-0">{{ _('Empty groups:') }} <strong>{{ stats.groups.empty_groups or 0 }}</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h3 class="mb-0">{{ _('Number of members per group') }}</h3>
+        </div>
+        <div class="flex-grow-1">
+            <canvas id="topGroupsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Section 2: Activity and Logs -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h3 class="mb-0">{{ _('Activity and Logs') }}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="row g-4">
+                        <div class="col-12 h-100">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">{{ _('Created users (last 30 days)') }}</h5>
+                                        <a href="{{ url_for('users.export_statistics', report_type='recent_creations') }}" class="btn btn-sm btn-light btn-export">
+                                            <i class="fas fa-file-excel"></i> {{ _('Export') }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-wrapper">
+                                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ _('Full Name') }}</th>
+                                                    <th>{{ _('Creation Date') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for name, date in stats.activity.recent_creations %}
+                                                <tr>
+                                                    <td>{{ name }}</td>
+                                                    <td>{{ date.strftime('%d/%m/%Y') }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">{{ _('Locked accounts (30d)') }}</h5>
+                                        <a href="{{ url_for('users.export_statistics', report_type='locked_users') }}" class="btn btn-sm btn-light btn-export">
+                                            <i class="fas fa-file-excel"></i> {{ _('Export') }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-wrapper">
+                                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ _('Full Name') }}</th>
+                                                    <th>{{ _('Lock Date') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for name, date in stats.activity.locked_users %}
+                                                <tr>
+                                                    <td>{{ name }}</td>
+                                                    <td>{{ date.strftime('%d/%m/%Y %H:%M') }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">{{ _('Groups without members') }}</h5>
+                                        <a href="{{ url_for('users.export_statistics', report_type='empty_groups') }}" class="btn btn-sm btn-light btn-export">
+                                            <i class="fas fa-file-excel"></i> {{ _('Export') }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-wrapper">
+                                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ _('Group Name') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for group in stats.activity.empty_groups %}
+                                                <tr>
+                                                    <td>{{ group }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">{{ _('Disabled users') }}</h5>
+                                        <a href="{{ url_for('users.export_statistics', report_type='disabled_users') }}" class="btn btn-sm btn-light btn-export">
+                                            <i class="fas fa-file-excel"></i> {{ _('Export') }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-wrapper">
+                                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ _('User') }}</th>
+                                                    <th>{{ _('Last Login') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for user, time in stats.activity.disabled_users %}
+                                                <tr>
+                                                    <td>{{ user }}</td>
+                                                    <td>{{ time.strftime('%d/%m/%Y %H:%M') if time and time.year > 1601 else _('Never') }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mt-4 border-0 shadow-sm">
+                                <div class="card-header bg-success text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">{{ _('Inactive users (> 3 months)') }}</h5>
+                                        <a href="{{ url_for('users.export_statistics', report_type='inactive_users') }}" class="btn btn-sm btn-light btn-export">
+                                            <i class="fas fa-file-excel"></i> {{ _('Export') }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-wrapper">
+                                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ _('User') }}</th>
+                                                    <th>{{ _('Last Login') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for user, time in stats.activity.inactive_users_3months %}
+                                                <tr>
+                                                    <td>{{ user }}</td>
+                                                    <td>{{ time.strftime('%d/%m/%Y %H:%M') }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Empty div for spacing -->
+                        <div class="col-12"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endwith %}
+{% endblock %}
+
+{% block scripts %}
+<!-- Store stats data in a hidden element -->
+<div id="stats-data" data-stats='{{ stats|tojson|safe }}' style="display: none;"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/statistics.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statsElement = document.getElementById('stats-data');
+    try {
+        const statsData = JSON.parse(statsElement.dataset.stats || '{}');
+        if (typeof initCharts === 'function') {
+            initCharts(statsData);
+        }
+    } catch (error) {
+        console.warn('{{ _('Error parsing statistics data:') }}', error);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ _('Création d\'un utilisateur') }}</h2>
+    
+<div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">{{ _('Informations de l\'utilisateur') }}</h5>
+        </div>
+        <div class="card-body">
+            <form id="user-create-form" method="POST" action="{{ url_for('users.create') }}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="service_profile">{{ _('Profil de Service') }}</label>
+                            <select class="form-control" id="service_profile" name="service_profile">
+                                <option value="">{{ _('Sélectionner un profil...') }}</option>
+                                {% for profile in service_profiles %}
+                                <option value="{{ profile.id }}" 
+                                        data-function="{{ profile.function|default('') }}"
+                                        data-service="{{ profile.service|default('') }}"
+                                        data-ip-telephony="{{ 'true' if profile.ip_telephony else '' }}"
+                                        data-samaccountname-suffix="{{ profile.samaccountname_suffix|default('') }}"
+                                        data-commonname-suffix="{{ profile.commonname_suffix|default('') }}"
+                                        data-givenname-suffix="{{ profile.givenname_suffix|default('') }}"
+                                        data-mail-suffix="{{ profile.mail_suffix|default('') }}"
+                                        data-mailnickname-suffix="{{ profile.mailnickname_suffix|default('') }}"
+                                        data-proxyaddresses-suffix="{{ profile.proxyaddresses_suffix|default('') }}"
+                                        data-targetaddress-suffix="{{ profile.targetaddress_suffix|default('') }}">
+                                    {{ profile.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">
+                                {{ _('Le profil de service définit la fonction, le service, et les paramètres de téléphonie') }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="nom">{{ _('NOM') }}</label>
+                            <input type="text" class="form-control" id="nom" name="nom" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="prenom">{{ _('Prénom') }}</label>
+                            <input type="text" class="form-control" id="prenom" name="prenom" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="hidden" id="fonction" name="fonction">
+                        <input type="hidden" id="service" name="service">
+                        <input type="hidden" id="telephonie_ip" name="telephonie_ip">
+                        <div class="form-group">
+                            <label for="username">{{ _('Username') }}</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="username" name="username">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="check_username">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">{{ _('Généré automatiquement à partir du nom et prénom') }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="expiration_date">{{ _('Date d\'expiration du compte') }}</label>
+                            <input type="text" class="form-control" id="expiration_date" name="expiration_date" placeholder="DD-MM-YYYY" pattern="\d{2}-\d{2}-\d{4}">
+                            <small class="form-text text-muted">{{ _('Optionnel - Pour les comptes stagiaires, consultants, prestataires') }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6 text-right">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-user-plus"></i> {{ _('Créer l\'utilisateur') }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+/* Style des champs invalides */
+.form-control.is-invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Améliorations visuelles */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.list-group-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+}
+
+.list-group-item i {
+    margin-right: 0.5rem;
+    color: #007bff;
+}
+
+/* Espacement des boutons */
+.btn {
+    margin-right: 0.5rem;
+}
+
+.btn:last-child {
+    margin-right: 0;
+}
+
+/* Style des checkboxes */
+.custom-control-input:checked ~ .custom-control-label::before {
+    border-color: #007bff;
+    background-color: #007bff;
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Amélioration des inputs */
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Style des alerts */
+.alert {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    async function generateUsername() {
+        const prenom = $('#prenom').val().trim();
+        const nom = $('#nom').val().trim();
+        
+        try {
+            const response = await $.getJSON("{{ url_for('users.get_username_config') }}");
+            const config = response.config;
+            
+            if (!config.username_pattern_order) {
+                const prenomPart = prenom.substring(0, 3).toLowerCase();
+                const nomPart = nom.substring(0, 3).toLowerCase();
+                return `${prenomPart}${nomPart}`;
+            }
+
+            let first = config.username_pattern_order === 'NOM_PRENOM' ? nom : prenom;
+            let second = config.username_pattern_order === 'NOM_PRENOM' ? prenom : nom;
+
+            first = first.toLowerCase();
+            second = second.toLowerCase();
+
+            if (config.username_first_part_chars !== '*') {
+                first = first.substring(0, parseInt(config.username_first_part_chars) || 3);
+            }
+            if (config.username_second_part_chars !== '*') {
+                second = second.substring(0, parseInt(config.username_second_part_chars) || 3);
+            }
+
+            return first + (config.username_separator || '') + second;
+        } catch (error) {
+            console.error("{{ _('Erreur lors de la récupération de la configuration:') }}", error);
+            const prenomPart = prenom.substring(0, 3).toLowerCase();
+            const nomPart = nom.substring(0, 3).toLowerCase();
+            return `${prenomPart}${nomPart}`;
+        }
+    }
+
+    async function updateUsername() {
+        if ($('#prenom').val().trim() && $('#nom').val().trim()) {
+            const sam = await generateUsername();
+            if (sam) {
+                $('#username').val(sam).trigger('change');
+
+                const profileId = $('#service_profile').val();
+                $.getJSON("{{ url_for('users.check_username') }}", {
+                    username: sam,
+                    profile_id: profileId
+                })
+                .done(function(data) {
+                    if (data.exists) {
+                        alert("{{ _('Le username existe déjà dans l\'AD') }}");
+                        $('#username').addClass('is-invalid');
+                    } else {
+                        $('#username').removeClass('is-invalid');
+                    }
+                })
+                .fail(function() {
+                    console.error("{{ _('Erreur lors de la vérification du username') }}");
+                });
+            }
+        }
+    }
+
+    $('#service_profile').on('change', function() {
+        const selectedOption = $(this).find('option:selected');
+        $('#fonction').val(selectedOption.data('function'));
+        $('#service').val(selectedOption.data('service'));
+        $('#telephonie_ip').val(selectedOption.data('ip-telephony') ? 'on' : '');
+    });
+
+    $('#prenom, #nom, #service_profile').on('change', function() {
+        updateUsername();
+    });
+
+    $('#username').on('input', function() {
+        $(this).removeClass('is-invalid');
+    });
+
+    $('#check_username').on('click', function() {
+        const samAccountName = generateSamAccountName();
+        if (samAccountName) {
+            $('#username').val(samAccountName).trigger('change');
+
+            const profileId = $('#service_profile').val();
+            $.getJSON("{{ url_for('users.check_username') }}", {
+                username: samAccountName,
+                profile_id: profileId
+            })
+            .done(function(data) {
+                if (data.exists) {
+                    alert("{{ _('Le username existe déjà dans l\'AD') }}");
+                    $('#username').addClass('is-invalid');
+                } else {
+                    alert("{{ _('Le username est disponible.') }}");
+                    $('#username').removeClass('is-invalid');
+                }
+            })
+            .fail(function() {
+                console.error("{{ _('Erreur lors de la vérification du username') }}");
+            });
+        }
+    });
+
+    $('#nom').on('input', function () {
+        this.value = this.value.replace(/[^a-zA-Z0-9.-]/g, '').toUpperCase();
+    });
+
+    $('#prenom').on('input', function () {
+        let value = this.value.replace(/[^a-zA-Z0-9.-]/g, '');
+        this.value = value.replace(/([a-zA-Z0-9])([a-zA-Z0-9]*)/g, (match, firstChar, rest) => {
+            return firstChar.toUpperCase() + rest.toLowerCase();
+        });
+    });
+
+    $('#username').on('input', function () {
+        this.value = this.value.replace(/[^a-zA-Z0-9.-]/g, '');
+    });
+
+    // Date format validation
+    $('#expiration_date').on('input', function() {
+        let value = this.value;
+        if (value) {
+            const pattern = /^(\d{2})-(\d{2})-(\d{4})$/;
+            if (!pattern.test(value)) {
+                $(this).addClass('is-invalid');
+            } else {
+                const [_, day, month, year] = pattern.exec(value);
+                const date = new Date(year, month - 1, day);
+                const isValid = date.getDate() == day && date.getMonth() == month - 1 && date.getFullYear() == year;
+                $(this).toggleClass('is-invalid', !isValid);
+            }
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+
+    $('#service_profile').trigger('change');
+    updateUsername();
+});
+</script>
+{% endblock %}

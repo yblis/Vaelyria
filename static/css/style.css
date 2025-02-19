@@ -1,0 +1,513 @@
+:root {
+    --primary-color: #007AFF;
+    --danger-color: #FF3B30;
+    --success-color: #34C759;
+    --warning-color: #FF9500;
+    --background-color: #F5F5F7;
+    --card-background: #FFFFFF;
+}
+
+body {
+    padding-top: 76px;
+    margin-bottom: 0;
+    background-color: var(--background-color);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    color: #1D1D1F;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999 !important;
+}
+
+.container {
+    flex: 1;
+}
+
+.navbar-brand {
+    font-weight: 500;
+    color: var(--primary-color) !important;
+}
+
+.table-responsive {
+    margin-top: 20px;
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: var(--card-background);
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    border: none;
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    border: none;
+}
+
+.btn-group-sm > .btn, .btn-sm {
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    line-height: 1.5;
+    border-radius: .2rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 1px solid #E5E5E5;
+    padding: 0.7rem 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.1);
+}
+
+/* Form floating styles */
+.form-floating {
+    display: block;
+    position: relative;
+    width: 100%;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+    line-height: 1.25;
+    width: 100% !important;
+    min-width: 100% !important;
+}
+
+.table {
+    background: var(--card-background);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.table thead th {
+    background-color: rgba(0,0,0,0.02);
+    border-bottom: none;
+    font-weight: 500;
+}
+
+/* Style for Actions column */
+.table th:last-child,
+.table td:last-child {
+    min-width: 250px;
+    width: 200px;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+.nav-link {
+    color: #1D1D1F !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.nav-link:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.navbar .dropdown-menu {
+    position: absolute;
+    z-index: 9999 !important;
+}
+
+.modal {
+    z-index: 10000 !important;
+}
+
+.modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+    margin: 0.5rem auto;
+}
+
+.modal-content {
+    width: 100%;
+    position: relative;
+}
+
+h1, h2, h3 {
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color), #5ac8fa);
+    color: #fff;
+    border-radius: 12px;
+}
+
+.hero-title {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.footer {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -1px 0 rgba(0,0,0,0.1);
+    width: 100%;
+    margin-top: auto;
+    padding: 1rem 0;
+}
+
+/* Applique à .select2 le style proche de .form-select de Bootstrap */
+#account_filters.select2-hidden-accessible + .select2 {
+    width: auto !important; /* ou 100% selon le rendu souhaité */
+}
+
+.select2-container--default .select2-selection--single {
+    /* Dimensions similaires à .form-select */
+    height: calc(2.5rem + 2px) !important; 
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 0.375rem !important;
+    background-color: #fff !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    display: flex !important;
+    align-items: center !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    margin: 0 !important;
+    padding: 0 !important; /* pour éviter un décalage de texte éventuel */
+    color: #212529 !important; /* texte semblable à Bootstrap */
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    position: absolute !important;
+    top: 50% !important;
+    right: 0.75rem !important;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: auto;
+    pointer-events: none;
+}
+
+/* Optionnel : masquer la flèche « b » par défaut de Select2 (selon la version). */
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-width: 0 !important;
+}
+
+/* Optimisations mobiles */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.5rem;
+    }
+
+    /* Amélioration des tableaux sur mobile */
+    .table-responsive {
+        margin: 0;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        background-color: var(--card-background);
+        border-radius: 8px;
+    }
+
+    .table-wrapper {
+        padding: 1rem;
+        background-color: var(--card-background);
+    }
+
+    .table {
+        width: max-content;
+        min-width: 100%;
+        white-space: nowrap;
+        margin-bottom: 0;
+    }
+
+    /* Fixer l'en-tête du tableau */
+    .table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: var(--card-background);
+    }
+
+    .table thead th {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        min-width: 120px;
+        background-color: rgba(0,0,0,0.02);
+    }
+
+    .table tbody td {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        min-width: 120px;
+    }
+
+    .table td:last-child, .table th:last-child {
+        padding-right: 1rem;
+    }
+
+    /* Styles pour le scroll horizontal */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 3px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+    /* Garder les cartes fixes */
+    .card {
+        background: var(--card-background);
+        position: relative;
+    }
+
+    .card-header {
+        background-color: var(--card-background);
+        position: relative;
+        z-index: 2;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .card-body {
+        position: relative;
+        z-index: 1;
+        padding: 0;
+        background-color: var(--card-background);
+    }
+
+    /* Conteneur pour maintenir les marges du tableau */
+    .table-wrapper {
+        padding: 1rem;
+    }
+
+    /* Style spécifique pour les tableaux empilés */
+    .table-mobile-stack td {
+        display: block;
+        text-align: right;
+        border-bottom: none;
+        white-space: normal;
+    }
+
+    .table-mobile-stack td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    .table-mobile-stack tr {
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    /* Optimisation des selects */
+    select.form-select,
+    .select2-container {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        width: 100% !important;
+    }
+
+    /* Ajustement du bouton d'export */
+    .btn-export {
+        margin-bottom: 1rem;
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    /* Textarea pour les domaines AD */
+    textarea.form-control[name="ad_domains"] {
+        min-height: 100px;
+        white-space: pre-wrap;
+        font-family: monospace;
+    }
+
+    /* Amélioration des formulaires */
+    .form-control, .btn {
+        font-size: 16px; /* Évite le zoom sur iOS */
+        height: 44px; /* Meilleure zone de touch */
+    }
+
+    .form-floating > .form-control {
+        height: 44px;
+        padding-top: 1.2rem;
+    }
+
+    /* Meilleur espacement des boutons */
+    .btn-group > .btn {
+        padding: 0.5rem 1rem;
+        margin: 0.25rem;
+    }
+
+    /* Amélioration du menu mobile */
+    .navbar-collapse {
+        background: var(--card-background);
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-top: 0.5rem;
+    }
+
+    .navbar-nav .nav-item {
+        margin: 0.5rem 0;
+    }
+
+    .dropdown-menu {
+        border: 1px solid rgba(0,0,0,0.1);
+        background: var(--card-background);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        border-radius: 8px;
+    }
+
+    .dropdown-item {
+        padding: 0.75rem 1rem;
+        margin: 0.25rem 0;
+        border-radius: 8px;
+        background: transparent;
+        transition: background-color 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+}
+
+/* Amélioration du touch sur tous les éléments cliquables */
+@media (hover: none) {
+    .btn, .nav-link, .dropdown-item {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .form-control, .btn, .nav-link {
+        touch-action: manipulation;
+    }
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    padding: 0;
+}
+
+@media (max-width: 992px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* Styles pour le mode offline */
+.offline-indicator {
+    position: fixed;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 59, 48, 0.95);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    z-index: 1001;
+    display: none;
+}
+
+.offline .offline-indicator {
+    display: block;
+}
+
+/* Animation de chargement pour les actions asynchrones */
+.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: -0.75rem;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card p-4 mb-4">
+    <h2 class="mb-4">{{ _('User Search') }}</h2>
+    <form method="GET" id="searchForm">
+        <div class="row g-3">
+            <div class="col-12">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="search_term" name="search_term" value="{{ request.args.get('search_term', '') }}" placeholder="{{ _('Search') }}">
+                    <label for="search_term">{{ _('Search by name, username or email') }}</label>
+                </div>
+            </div>
+
+            <div class="col-12 mt-3">
+                <input type="hidden" name="selected_ou" id="selected_ou" value="{{ request.args.get('selected_ou', '') }}">
+                <div class="row g-2">
+                    <div class="col-auto">
+                        <button class="btn btn-secondary" type="button" id="ouFilterBtn" data-bs-toggle="modal" data-bs-target="#ouFilterModal">
+                            {{ _('Filter by OU') }}
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <select class="form-select" id="account_filters" name="account_filters[]" style="width: auto;">
+                            <option value="">{{ _('All states...') }}</option>
+                            <option class="fas fa-check text-success me-2" value="512" {{ '512' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Account enabled') }}</option>
+                            <option class="fas fa-check text-success me-2" value="66048" {{ '66048' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Account enabled / Password never expires') }}</option>
+                            <option class="fas fa-times text-danger me-2" value="514" {{ '514' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Account disabled') }}</option>
+                            <option class="fas fa-clock text-warning me-2" value="8388608" {{ '8388608' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Account with expired password') }}</option>
+                            <option class="fas fa-infinity text-info me-2" value="65536" {{ '65536' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Password never expires') }}</option>
+                            <option class="fas fa-key text-muted me-2" value="32" {{ '32' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Password not required') }}</option>
+                            <option class="fas fa-user-lock text-secondary me-2" value="16" {{ '16' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Account locked') }}</option>
+                            <option class="fas fa-user-secret text-primary me-2" value="64" {{ '64' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('User cannot change password') }}</option>
+                            <option class="fas fa-user-shield text-warning me-2" value="262144" {{ '262144' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Smart card login required') }}</option>
+                            <option class="fas fa-user-times text-danger me-2" value="4194304" {{ '4194304' in request.args.getlist('account_filters[]')|default([]) and 'selected' or '' }}>{{ _('Kerberos pre-authentication not required') }}</option>
+                        </select>
+                    </div>
+                    {% if domains %}
+                    <div class="col-auto">
+                        <select class="form-select" name="domain_filter" id="domain_filter" style="width: auto;">
+                            <option value="">{{ _('All domains') }}</option>
+                            {% for domain in domains %}
+                            <option value="{{ domain }}" {% if domain == request.args.get('domain_filter') %}selected{% endif %}>{{ domain }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    {% if request.args.get('selected_ou') %}
+                    <div class="col-auto">
+                        <span class="badge bg-primary">
+                            {{ _('Selected OU:') }} {{ ','.join(request.args.get('selected_ou').split(',')[::-1]) | replace('OU=', '') }}
+                            <i class="fas fa-times ms-2" style="cursor: pointer" id="clearOuFilterBtn" title="{{ _('Remove filter') }}"></i>
+                        </span>
+                    </div>
+                    {% endif %}
+                    <div class="col-auto ms-auto">
+                        <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="form-check form-switch mt-2" style="padding-left: 2em;">
+                    <input class="form-check-input" type="checkbox" name="has_email" id="has_email" value="1"
+                           {% if request.args.get('has_email') %} checked {% endif %}>
+                    <label class="form-check-label" for="has_email">
+                        {{ _('Show only accounts with email address') }}
+                    </label>
+                </div>                
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- OU Filter Modal -->
+<div class="modal fade" id="ouFilterModal" tabindex="-1" aria-labelledby="ouFilterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ouFilterModalLabel">{{ _('Select Organizational Unit') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body">
+                <form id="ouFilterForm">
+                    <input type="hidden" id="selected_ou" name="selected_ou" value="{{ request.args.get('selected_ou', '') }}">
+                    <div class="form-group">
+                        <label for="ouFilterTree">{{ _('Select Organizational Unit (OU)') }}</label>
+                        <div id="ouFilterTree"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="clearOuFilter">{{ _('Clear filter') }}</button>
+                <button type="button" class="btn btn-primary" id="confirmOuFilter" disabled>{{ _('Apply') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if users %}
+<h3>
+    {% if search_term %}
+    {{ _('Search Results') }}
+    {% else %}
+    {{ _('User List') }}
+    {% endif %}
+    {% if total_users %}
+    <small class="text-muted">({{ ngettext('%(count)d user', '%(count)d users', total_users, count=total_users) }})</small>
+    {% endif %}
+</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>{{ _('Status') }}</th>
+            <th data-sortable="true" data-column="nom" style="cursor: pointer">
+                {{ _('Last Name') }} <i class="fas fa-sort"></i>
+            </th>
+            <th data-sortable="true" data-column="prenom" style="cursor: pointer">
+                {{ _('First Name') }} <i class="fas fa-sort"></i>
+            </th>
+            <th data-sortable="true" data-column="username" style="cursor: pointer">
+                {{ _('Username') }} <i class="fas fa-sort"></i>
+            </th>
+            <th data-sortable="true" data-column="email" style="cursor: pointer">
+                {{ _('Email') }} <i class="fas fa-sort"></i>
+            </th>
+            <th>{{ _('Organizational Unit') }}</th>
+            <th>{{ _('Actions') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr data-dn="{{ user.entry_dn }}">
+            <td class="text-center">
+                {% if ',OU=Corbeille,' in user.entry_dn %}
+                <i class="fas fa-trash text-danger" title="{{ _('In trash') }}"></i>
+                {% elif user.userAccountControl.value is defined and user.userAccountControl.value | int == 514 %}
+                <i class="fas fa-lock text-danger" title="{{ _('Account locked') }}"></i>
+                {% else %}
+                <i class="fas fa-lock-open text-success" title="{{ _('Account unlocked') }}"></i>
+                {% endif %}
+            </td>
+            <td>{{ user.sn.value if user.sn is defined else '' }}</td>
+            <td>{{ user.givenName.value if user.givenName is defined else '' }}</td>
+            <td>{{ user.sAMAccountName.value if user.sAMAccountName is defined else '' }}</td>
+            <td>{{ user.mail.value if user.mail is defined else '' }}</td>
+            
+            <td>{% set parts = user.entry_dn.split(',') %}{% set ou_parts = [] %}{% for part in parts %}{% if part.startswith('OU=') %}{% set _ = ou_parts.append(part[3:]) %}{% endif %}{% endfor %}/{{ ou_parts|reverse|join('/') }}/</td>
+            
+            <td>
+                <a href="{{ url_for('users.edit_user', dn=user.entry_dn) }}" class="btn btn-sm btn-primary" title="{{ _('View/Edit') }}"><i class="fas fa-edit"></i></a>
+                {% if ',OU=Corbeille,' not in user.entry_dn %}
+                <a href="#" class="btn btn-sm btn-danger trash-user" data-dn="{{ user.entry_dn }}" title="{{ _('Move to trash') }}"><i class="fas fa-trash-alt"></i></a>
+                {% endif %}
+                {% if user.userAccountControl.value is defined and user.userAccountControl.value | int == 514 %}
+                <a href="#" class="btn btn-sm btn-success unlock-user" data-dn="{{ user.entry_dn }}" title="{{ _('Unlock') }}"><i class="fas fa-unlock"></i></a>
+                {% else %}
+                <a href="#" class="btn btn-sm btn-warning lock-user" data-dn="{{ user.entry_dn }}" title="{{ _('Lock') }}"><i class="fas fa-lock"></i></a>
+                {% endif %}
+                {% if ',OU=Corbeille,' in user.entry_dn %}
+                <a href="#" class="btn btn-sm btn-success restore-user" data-dn="{{ user.entry_dn }}" title="{{ _('Restore') }}" data-bs-toggle="modal" data-bs-target="#restoreModal"><i class="fas fa-trash-restore"></i></a>
+                {% else %}
+                <a href="#" class="btn btn-sm btn-warning move-user" data-dn="{{ user.entry_dn }}" title="{{ _('Move') }}" data-bs-toggle="modal" data-bs-target="#restoreModal"><i class="fas fa-arrow-right"></i></a>
+                <button class="btn btn-sm btn-info reset-password-btn" title="{{ _('Reset password') }}" data-dn="{{ user.entry_dn }}" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                    <i class="fas fa-key"></i>
+                </button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<button type="button" id="exportBtn" class="btn btn-success">
+    <i class="fas fa-file-excel"></i> {{ _('Export to Excel') }}
+</button>
+
+<!-- Password Reset Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resetPasswordModalLabel">{{ _('Reset Password') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resetPasswordForm">
+                    <input type="hidden" id="resetPasswordDn" name="dn">
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">{{ _('New Password') }}</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="forceReset">
+                            <label class="form-check-label" for="forceReset">
+                                {{ _('User must reset password at next login') }}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="enableUser">
+                            <label class="form-check-label" for="enableUser">
+                                {{ _('Enable user if disabled') }}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="preventChange">
+                            <label class="form-check-label" for="preventChange">
+                                {{ _('User cannot change password') }}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="neverExpire">
+                            <label class="form-check-label" for="neverExpire">
+                                {{ _('Password never expires') }}
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="confirmResetPassword">{{ _('Reset') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Restore Modal -->
+<div class="modal fade" id="restoreModal" tabindex="-1" aria-labelledby="restoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="restoreModalLabel">{{ _('Restore User') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body">
+                <form id="restoreForm">
+                    <input type="hidden" name="dn" id="restoreDn">
+                    <div class="form-group">
+                        <label for="ouSelect">{{ _('Select Organizational Unit (OU)') }}</label>
+                        <div id="ldapTree"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-success" id="confirmRestore">{{ _('Restore') }}</button>
+                <button type="button" class="btn btn-warning d-none" id="confirmMove">{{ _('Move') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">{{ _('Select attributes to export') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm" data-export-form>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="sn" id="attr_sn" name="attributes" checked>
+                            <label class="form-check-label" for="attr_sn">{{ _('sn (Last Name)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="givenName" id="attr_givenName" name="attributes" checked>
+                            <label class="form-check-label" for="attr_givenName">{{ _('givenName (First Name)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="samAccountName" id="attr_samAccountName" name="attributes" checked>
+                            <label class="form-check-label" for="attr_samAccountName">{{ _('samAccountName (Username)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="mail" id="attr_mail" name="attributes" checked>
+                            <label class="form-check-label" for="attr_mail">{{ _('mail (Email Address)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="company" id="attr_company" name="attributes">
+                            <label class="form-check-label" for="attr_company">{{ _('company (Company)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="department" id="attr_department" name="attributes">
+                            <label class="form-check-label" for="attr_department">{{ _('department (Department)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="title" id="attr_title" name="attributes">
+                            <label class="form-check-label" for="attr_title">{{ _('title (Job Title)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="ipPhone" id="attr_ipPhone" name="attributes">
+                            <label class="form-check-label" for="attr_ipPhone">{{ _('ipPhone (IP Phone)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="mobile" id="attr_mobile" name="attributes">
+                            <label class="form-check-label" for="attr_mobile">{{ _('mobile (Mobile Phone)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="manager" id="attr_manager" name="attributes">
+                            <label class="form-check-label" for="attr_manager">{{ _('manager (Manager)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="lastLogon" id="attr_lastLogon" name="attributes">
+                            <label class="form-check-label" for="attr_lastLogon">{{ _('lastLogon (Last Login)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="whenCreated" id="attr_whenCreated" name="attributes">
+                            <label class="form-check-label" for="attr_whenCreated">{{ _('whenCreated (Account Creation Date)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="distinguishedName" id="attr_distinguishedName" name="attributes">
+                            <label class="form-check-label" for="attr_distinguishedName">{{ _('distinguishedName (AD Unique Identifier)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="employeeID" id="attr_employeeID" name="attributes">
+                            <label class="form-check-label" for="attr_employeeID">{{ _('employeeID (Employee ID)') }}</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" id="confirmExport">{{ _('Export') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if total_pages > 1 %}
+{% set items_per_page = 50 %}
+{% set start_item = ((current_page - 1) * items_per_page) + 1 %}
+{% set end_item = [current_page * items_per_page, total_users] | min %}
+<div class="text-center mb-2">
+    {{ _('Showing users %(start)d-%(end)d of %(total)d', start=start_item, end=end_item, total=total_users) }}
+</div>
+<nav aria-label="{{ _('User pagination') }}" class="mt-3">
+    <ul class="pagination justify-content-center">
+        {% set start = [current_page - 2, 1] | max %}
+        {% set end = [start + 4, total_pages] | min %}
+        {% set start = [end - 4, 1] | max %}
+
+        {% if current_page > 3 %}
+        <li class="page-item">
+            {% with account_filters = request.args.getlist('account_filters[]'), selected_ou = request.args.get('selected_ou', '') %}
+            <a class="page-link" href="{{ url_for('users.search', search_term=search_term, page=1, selected_ou=selected_ou, sort_column=request.args.get('sort_column'), sort_direction=request.args.get('sort_direction'), **{'account_filters[]': account_filters}) }}">&laquo;</a>
+            {% endwith %}
+        </li>
+        {% endif %}
+
+        {% for p in range(start, end + 1) %}
+        <li class="page-item {% if p == current_page %}active{% endif %}">
+            {% with account_filters = request.args.getlist('account_filters[]'), selected_ou = request.args.get('selected_ou', '') %}
+            <a class="page-link" href="{{ url_for('users.search', search_term=search_term, page=p, selected_ou=selected_ou, sort_column=request.args.get('sort_column'), sort_direction=request.args.get('sort_direction'), **{'account_filters[]': account_filters}) }}">{{ p }}</a>
+            {% endwith %}
+        </li>
+        {% endfor %}
+
+        {% if end < total_pages %}
+        <li class="page-item">
+            {% with account_filters = request.args.getlist('account_filters[]'), selected_ou = request.args.get('selected_ou', '') %}
+            <a class="page-link" href="{{ url_for('users.search', search_term=search_term, page=total_pages, selected_ou=selected_ou, sort_column=request.args.get('sort_column'), sort_direction=request.args.get('sort_direction'), **{'account_filters[]': account_filters}) }}">&raquo;</a>
+            {% endwith %}
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/export.js') }}"></script>
+<script type="text/javascript">
+    var APP_DATA = {
+        searchTerm: "{{ request.args.get('search_term', '') }}",
+        accountFilters: {{ request.args.getlist('account_filters[]')|tojson|safe }},
+        hasEmail: {{ 'true' if request.args.get('has_email') else 'false' }},
+        domainFilter: "{{ request.args.get('domain_filter', '') }}",
+        exportUrl: "{{ url_for('users.export_search_results') }}"
+    };
+</script>
+<script src="{{ url_for('static', filename='js/user_search.js') }}"></script>
+{% endblock %}

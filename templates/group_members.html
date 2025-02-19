@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ _('Membres du groupe') }}</h2>
+<div class="table-responsive">
+    <table class="table table-striped table-mobile-stack">
+        <thead>
+            <tr>
+                <th>{{ _('Nom') }}</th>
+                <th>{{ _('Prénom') }}</th>
+                <th>{{ _('Nom d\'utilisateur') }}</th>
+                <th>{{ _('Actions') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+            <tr>
+                <td>{{ member.sn.value|default('N/A') }}</td>
+                <td>{{ member.givenName.value|default('N/A') }}</td>
+                <td>{{ member.sAMAccountName.value|default('N/A') }}</td>
+                <td>
+                <a href="{{ url_for('groups.remove_group_member', group_dn=group_dn, user_dn=member.entry_dn) }}" class="btn btn-sm btn-danger" onclick="return confirm('{{ _('Êtes-vous sûr de vouloir retirer cet utilisateur du groupe ?') }}')" title="{{ _('Retirer') }}">
+                    <i class="fas fa-user-minus"></i>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>{{ _('Ajouter des membres') }}</h3>
+<div class="mb-4">
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="userSearch" placeholder="{{ _('Rechercher des utilisateurs...') }}" autocomplete="off">
+        <button class="btn btn-outline-secondary" type="button" id="searchButton">{{ _('Rechercher') }}</button>
+    </div>
+    <div id="searchResults" class="list-group mb-3" style="display: none;">
+        <!-- Les résultats de recherche seront insérés ici -->
+    </div>
+    <form id="addMembersForm" action="{{ url_for('groups.add_group_member', group_dn=group_dn) }}" method="POST">
+        <div id="selectedUsers" class="mb-3">
+            <!-- Les utilisateurs sélectionnés seront affichés ici -->
+        </div>
+        <input type="hidden" name="user_dns" id="userDns">
+        <button type="submit" class="btn btn-primary" id="addButton" style="display: none;">{{ _('Ajouter les membres sélectionnés') }}</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('userSearch');
+    const searchButton = document.getElementById('searchButton');
+    const searchResults = document.getElementById('searchResults');
+    const selectedUsers = document.getElementById('selectedUsers');
+    const userDnsInput = document.getElementById('userDns');
+    const addButton = document.getElementById('addButton');
+    
+    let selectedUserDns = new Set();
+
+    function updateSelectedUsers() {
+        addButton.style.display = selectedUserDns.size > 0 ? 'block' : 'none';
+        // Encode commas in DN to prevent splitting
+        userDnsInput.value = Array.from(selectedUserDns).map(dn => encodeURIComponent(dn)).join('|');
+    }
+
+    function addSelectedUser(user) {
+        if (!selectedUserDns.has(user.dn)) {
+            selectedUserDns.add(user.dn);
+            
+            const userElement = document.createElement('div');
+            userElement.className = 'alert alert-info d-flex justify-content-between align-items-center';
+            userElement.innerHTML = 
+                '<span>' + user.displayName + ' (' + user.sAMAccountName + ')</span>' +
+                '<button type="button" class="btn-close" aria-label="' + "{{ _('Retirer') }}" + '"></button>';
+            
+            userElement.querySelector('.btn-close').addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent click from bubbling up to document
+                selectedUserDns.delete(user.dn);
+                userElement.remove();
+                updateSelectedUsers();
+            });
+            
+            selectedUsers.appendChild(userElement);
+            updateSelectedUsers();
+        }
+    }
+
+    function performSearch() {
+        const searchTerm = searchInput.value.trim();
+        
+        if (searchTerm.length < 3) {
+            searchResults.innerHTML = '<div class="list-group-item text-warning">' + "{{ _('Veuillez saisir au moins 3 caractères pour effectuer la recherche') }}" + '</div>';
+            searchResults.style.display = 'block';
+            return;
+        }
+
+        searchResults.innerHTML = '<div class="list-group-item">' + "{{ _('Recherche en cours...') }}" + '</div>';
+        searchResults.style.display = 'block';
+
+        fetch("{{ url_for('groups.search_users_for_group') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: new URLSearchParams({
+                'search_term': searchTerm,
+                'group_dn': '{{ group_dn }}'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            searchResults.innerHTML = '';
+            if (data.users.length > 0) {
+                data.users.forEach(user => {
+                    const resultItem = document.createElement('button');
+                    resultItem.type = 'button';
+                    resultItem.className = 'list-group-item list-group-item-action';
+                    resultItem.innerHTML = 
+                        '<div class="d-flex justify-content-between align-items-center">' +
+                            '<div>' +
+                                '<strong>' + (user.displayName || user.sAMAccountName) + '</strong>' +
+                                '<div class="text-muted small">' +
+                                    (user.mail ? '<div>' + user.mail + '</div>' : '') +
+                                    '<div>' + "{{ _('Utilisateur:') }}" + ' ' + user.sAMAccountName + '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<span class="badge bg-primary rounded-pill">' + "{{ _('Ajouter') }}" + '</span>' +
+                        '</div>';
+                    resultItem.addEventListener('click', () => {
+                        addSelectedUser(user);
+                        searchInput.value = '';
+                    });
+                    searchResults.appendChild(resultItem);
+                });
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = '<div class="list-group-item">' + "{{ _('Aucun utilisateur trouvé') }}" + '</div>';
+                searchResults.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            searchResults.innerHTML = '<div class="list-group-item text-danger">' + "{{ _('Erreur lors de la recherche. Veuillez réessayer.') }}" + '</div>';
+            searchResults.style.display = 'block';
+        });
+    }
+
+    // Event listeners
+    searchButton.addEventListener('click', performSearch);
+    
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
+    });
+
+    // Cacher les résultats quand on clique ailleurs
+    document.addEventListener('click', function(e) {
+        if (!searchResults.contains(e.target) && !searchInput.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

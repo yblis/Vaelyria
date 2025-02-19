@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ _('LDAP Configuration') }}</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST" class="mt-4">
+        <div class="form-group mb-3">
+            <label for="trash_ou">{{ _('Trash OU') }}</label>
+            <input type="text" class="form-control" id="trash_ou" name="trash_ou" 
+                   value="{{ config.trash_ou if config else '' }}" required>
+            <small class="form-text text-muted">{{ _('Example: OU=Disabled,DC=example,DC=com') }}</small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="default_password">{{ _('Default Password') }}</label>
+            <input type="password" class="form-control" id="default_password" name="default_password" 
+                   placeholder="{{ _('Leave empty to keep current password') }}">
+            <small class="form-text text-muted">{{ _('Default password for new users') }}</small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="domains">{{ _('Active Directory Domains') }}</label>
+            <textarea class="form-control" id="domains" name="domains" rows="3" placeholder="example.com&#10;example.org&#10;example.net" style="min-height: 100px; resize: vertical;">{{ config.domains if config else '' }}</textarea>
+            <small class="form-text text-muted">{{ _('One domain per line (example: example.com)') }}</small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="tenant">{{ _('Microsoft 365 Tenant (For hybrid environments)') }}</label>
+            <div class="input-group">
+                <span class="input-group-text">@</span>
+                <input type="text" class="form-control" id="tenant" name="tenant" 
+                       value="{{ config.tenant if config else '' }}" placeholder="tenant">
+                <span class="input-group-text">.onmicrosoft.com</span>
+            </div>
+            <small class="form-text text-muted">{{ _('Example: if your domain is @contoso.onmicrosoft.com, enter "contoso"') }}</small>
+        </div>
+
+        <div class="form-group mb-3">
+            <label>{{ _('Username Configuration') }}</label>
+            <div class="border p-3 rounded">
+                <div class="mb-3">
+                    <label>{{ _('Pattern order:') }}</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="username_pattern_order" id="nom_prenom" value="NOM_PRENOM" {% if config.username_pattern_order == 'NOM_PRENOM' %}checked{% endif %}>
+                        <label class="form-check-label" for="nom_prenom">
+                            {{ _('LASTNAME Firstname') }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="username_pattern_order" id="prenom_nom" value="PRENOM_NOM" {% if config.username_pattern_order == 'PRENOM_NOM' %}checked{% endif %}>
+                        <label class="form-check-label" for="prenom_nom">
+                            {{ _('Firstname LASTNAME') }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="username_first_part_chars">{{ _('Number of characters first part') }}</label>
+                            <input type="text" class="form-control" id="username_first_part_chars" name="username_first_part_chars" 
+                                   value="{{ config.username_first_part_chars if config else '' }}" placeholder="{{ _('Number or *') }}">
+                            <small class="form-text text-muted">{{ _('Use "*" for complete word') }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="username_second_part_chars">{{ _('Number of characters second part') }}</label>
+                            <input type="text" class="form-control" id="username_second_part_chars" name="username_second_part_chars" 
+                                   value="{{ config.username_second_part_chars if config else '' }}" placeholder="{{ _('Number or *') }}">
+                            <small class="form-text text-muted">{{ _('Use "*" for complete word') }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username_separator">{{ _('Separator') }}</label>
+                    <input type="text" class="form-control" id="username_separator" name="username_separator" 
+                           value="{{ config.username_separator if config else '' }}" maxlength="1" placeholder="{{ _('Optional') }}">
+                    <small class="form-text text-muted">{{ _('Separator character (leave empty to not use one)') }}</small>
+                </div>
+
+                <div class="form-group">
+                    <label>{{ _('Example for DUPONT Pierre:') }}</label>
+                    <div id="username_preview" class="p-2 bg-light rounded">
+                        <span class="text-muted">{{ _('Example will appear here') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-3">
+            <label>{{ _('Email Configuration') }}</label>
+            <div class="border p-3 rounded">
+                <div class="mb-3">
+                    <label>{{ _('Email format:') }}</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="email_pattern_order" id="email_prenom" value="PRENOM" {% if config.email_pattern_order == 'PRENOM' %}checked{% endif %}>
+                        <label class="form-check-label" for="email_prenom">
+                            {{ _('Firstname@{domain.com}') }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="email_pattern_order" id="email_nom" value="NOM" {% if config.email_pattern_order == 'NOM' %}checked{% endif %}>
+                        <label class="form-check-label" for="email_nom">
+                            {{ _('LASTNAME@{domain.com}') }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="email_pattern_order" id="email_prenom_nom" value="PRENOM_NOM" {% if config.email_pattern_order == 'PRENOM_NOM' %}checked{% endif %}>
+                        <label class="form-check-label" for="email_prenom_nom">
+                            {{ _('Firstname.LASTNAME@{domain.com}') }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="email_pattern_order" id="email_nom_prenom" value="NOM_PRENOM" {% if config.email_pattern_order == 'NOM_PRENOM' %}checked{% endif %}>
+                        <label class="form-check-label" for="email_nom_prenom">
+                            {{ _('LASTNAME.Firstname@{domain.com}') }}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email_first_part_chars">{{ _('Number of characters first part') }}</label>
+                            <input type="text" class="form-control" id="email_first_part_chars" name="email_first_part_chars" 
+                                   value="{{ config.email_first_part_chars if config else '' }}" placeholder="{{ _('Number or *') }}">
+                            <small class="form-text text-muted">{{ _('Use "*" for complete word') }}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email_second_part_chars">{{ _('Number of characters second part') }}</label>
+                            <input type="text" class="form-control" id="email_second_part_chars" name="email_second_part_chars" 
+                                   value="{{ config.email_second_part_chars if config else '' }}" placeholder="{{ _('Number or *') }}">
+                            <small class="form-text text-muted">{{ _('Use "*" for complete word') }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_separator">{{ _('Separator') }}</label>
+                    <input type="text" class="form-control" id="email_separator" name="email_separator" 
+                           value="{{ config.email_separator if config else '' }}" maxlength="1" placeholder="{{ _('Optional') }}">
+                    <small class="form-text text-muted">{{ _('Separator character (leave empty to not use one)') }}</small>
+                </div>
+
+                <div class="form-group">
+                    <label>{{ _('Example for DUPONT Pierre:') }}</label>
+                    <div id="email_preview" class="p-2 bg-light rounded">
+                        <span class="text-muted">{{ _('Example will appear here') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+    </form>
+</div>
+
+<script>
+    (function() {
+        function toggleEmailFields() {
+            const selectedPattern = document.querySelector('input[name="email_pattern_order"]:checked')?.value;
+            const secondPartField = document.getElementById('email_second_part_chars');
+            const separatorField = document.getElementById('email_separator');
+            
+            if (selectedPattern === 'PRENOM' || selectedPattern === 'NOM') {
+                secondPartField.disabled = true;
+                secondPartField.value = '';
+                separatorField.disabled = true;
+                separatorField.value = '';
+            } else {
+                secondPartField.disabled = false;
+                separatorField.disabled = false;
+            }
+        }
+
+        function updatePreview(type) {
+            const previewEl = document.getElementById(`${type}_preview`);
+            if (!previewEl) return;
+            
+            const order = document.querySelector(`input[name="${type}_pattern_order"]:checked`)?.value || 'NOM_PRENOM';
+            const firstChars = document.getElementById(`${type}_first_part_chars`)?.value || '3';
+            const secondChars = document.getElementById(`${type}_second_part_chars`)?.value || '3';
+            const separator = document.getElementById(`${type}_separator`)?.value || '';
+            
+            const example = {
+                nom: 'DUPONT',
+                prenom: 'Pierre'
+            };
+            
+            try {
+                let first = '';
+                let second = '';
+                
+                if (type === 'username') {
+                    first = order === 'NOM_PRENOM' ? example.nom : example.prenom;
+                    second = order === 'NOM_PRENOM' ? example.prenom : example.nom;
+                } else {
+                    if (order === 'PRENOM') {
+                        first = example.prenom;
+                    } else if (order === 'NOM') {
+                        first = example.nom;
+                    } else if (order === 'PRENOM_NOM') {
+                        first = example.prenom;
+                        second = example.nom;
+                    } else {
+                        first = example.nom;
+                        second = example.prenom;
+                    }
+                }
+                
+                const parsedFirst = parseInt(firstChars);
+                const parsedSecond = parseInt(secondChars);
+                
+                first = firstChars === '*' ? first : 
+                       !isNaN(parsedFirst) && parsedFirst >= 0 ? first.substring(0, parsedFirst) : 
+                       first.substring(0, 3);
+                
+                if (second) {
+                    second = secondChars === '*' ? second : 
+                            !isNaN(parsedSecond) && parsedSecond >= 0 ? second.substring(0, parsedSecond) : 
+                            second.substring(0, 3);
+                }
+                
+                let result = '';
+                if (type === 'username') {
+                    result = first && second ? (first + separator + second).toLowerCase() : '';
+                } else {
+                    if (order === 'PRENOM' || order === 'NOM') {
+                        result = first.toLowerCase() + '@{domain.com}';
+                    } else {
+                        result = (first + (separator || '') + second).toLowerCase() + '@{domain.com}';
+                    }
+                }
+                
+                if (!result) {
+                    throw new Error("{{ _('Length parameters must generate at least one character') }}");
+                }
+                
+                previewEl.innerHTML = `<strong>${result}</strong>`;
+            } catch (error) {
+                console.error(`Error generating ${type} preview:`, error);
+                previewEl.innerHTML = `<span class="text-danger">{{ _('Processing error') }}</span>`;
+            }
+        }
+        
+        ['username', 'email'].forEach(type => {
+            const elements = [
+                ...document.querySelectorAll(`input[name="${type}_pattern_order"]`),
+                document.getElementById(`${type}_first_part_chars`),
+                document.getElementById(`${type}_second_part_chars`),
+                document.getElementById(`${type}_separator`)
+            ];
+            
+            elements.forEach(el => {
+                if (el) el.addEventListener('input', () => updatePreview(type));
+            });
+            
+            updatePreview(type);
+            
+            const interval = setInterval(() => {
+                if (document.getElementById(`${type}_preview`).textContent.includes("{{ _('Example will appear here') }}")) {
+                    updatePreview(type);
+                } else {
+                    clearInterval(interval);
+                }
+            }, 100);
+        });
+
+        document.querySelectorAll('input[name="email_pattern_order"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                toggleEmailFields();
+                updatePreview('email');
+            });
+        });
+
+        toggleEmailFields();
+    })();
+</script>
+{% endblock %}

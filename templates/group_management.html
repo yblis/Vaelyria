@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card p-4 mb-4">
+    <h2>{{ _('Gestion des groupes') }}</h2>
+    <div class="mb-3">
+        <div class="row g-3">
+            <div class="col-12">
+                <input type="text" id="searchInput" class="form-control" placeholder="{{ _('Rechercher des groupes...') }}" value="{{ request.args.get('search', '') }}">
+            </div>
+            <div class="col-12">
+                <select id="typeFilter" class="form-select">
+                    <option value="">{{ _('Tous les groupes') }}</option>
+                    <option value="security" {% if request.args.get('type') == 'security' %}selected{% endif %}>{{ _('Groupes de sécurité') }}</option>
+                    <option value="distribution" {% if request.args.get('type') == 'distribution' %}selected{% endif %}>{{ _('Groupes de distribution') }}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+                    <i class="fas fa-plus"></i> {{ _('Créer un groupe') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Création de Groupe -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createGroupModalLabel">{{ _('Créer un nouveau groupe') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createGroupForm">
+                    <div class="mb-3">
+                        <label for="groupName" class="form-label">{{ _('Nom du groupe') }}</label>
+                        <input type="text" class="form-control" id="groupName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Type de groupe') }}</label>
+                        <select class="form-select" id="groupType" required>
+                            <option value="security">{{ _('Groupe de Sécurité') }}</option>
+                            <option value="distribution">{{ _('Groupe de Distribution') }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Étendue du groupe') }}</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="groupScope" id="scopeDomainLocal" value="domainLocal">
+                            <label class="form-check-label" for="scopeDomainLocal">
+                                {{ _('Domaine local') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="groupScope" id="scopeGlobal" value="global" checked>
+                            <label class="form-check-label" for="scopeGlobal">
+                                {{ _('Globale') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="groupScope" id="scopeUniversal" value="universal">
+                            <label class="form-check-label" for="scopeUniversal">
+                                {{ _('Universel') }}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Emplacement du groupe') }}</label>
+                        <div id="ldapTree" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px;"></div>
+                        <input type="hidden" id="selectedOU" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Annuler') }}</button>
+                <button type="button" class="btn btn-primary" onclick="createGroup()">{{ _('Créer le groupe') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmation Suppression -->
+<div class="modal fade" id="deleteGroupModal" tabindex="-1" aria-labelledby="deleteGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGroupModalLabel">{{ _('Confirmer la suppression') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ _('Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action est irréversible.') }}
+                <input type="hidden" id="groupToDelete">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Annuler') }}</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDeleteGroup()">{{ _('Supprimer') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-striped" id="groupsTable">
+    <thead>
+        <tr>
+            <th>{{ _('Nom du groupe') }}</th>
+            <th>{{ _('Actions') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dn, name in groups %}
+        <tr>
+            <td>{{ name }}</td>
+            <td>
+                <a href="{{ url_for('groups.group_members', group_dn=dn) }}" class="btn btn-sm btn-info" title="{{ _('Voir les membres') }}">
+                    <i class="fas fa-users"></i>
+                </a>
+                <button onclick="showExportModal('{{ dn }}')" class="btn btn-sm btn-success" title="{{ _('Exporter') }}">
+                    <i class="fas fa-file-export"></i>
+                </button>
+                <button onclick="showDeleteModal('{{ dn }}')" class="btn btn-sm btn-danger" title="{{ _('Supprimer') }}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Page info -->
+<div class="text-center text-muted mb-2">
+    {% set start = (page - 1) * per_page + 1 %}
+    {% set end = start + per_page - 1 %}
+    {% if end > total %}{% set end = total %}{% endif %}
+    {{ _('Affichage des groupes %(start)s-%(end)s sur %(total)s', start=start, end=end, total=total) }}
+</div>
+
+<!-- Pagination controls -->
+<nav aria-label="{{ _('Navigation des pages') }}">
+    <ul class="pagination justify-content-center">
+        {% if page > 1 %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('groups.list_groups', page=page-1, per_page=per_page, search=request.args.get('search', ''), type=request.args.get('type')) }}" aria-label="{{ _('Précédent') }}">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        
+        {% set total_pages = ((total - 1) // per_page) + 1 %}
+        {% set start_page = page - 2 %}
+        {% if start_page < 1 %}{% set start_page = 1 %}{% endif %}
+        {% set end_page = page + 2 %}
+        {% if end_page > total_pages %}{% set end_page = total_pages %}{% endif %}
+        {% for p in range(start_page, end_page + 1) %}
+        <li class="page-item {% if p == page %}active{% endif %}">
+            <a class="page-link" href="{{ url_for('groups.list_groups', page=p, per_page=per_page, search=request.args.get('search', ''), type=request.args.get('type')) }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+        
+        {% if page < total_pages %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('groups.list_groups', page=page+1, per_page=per_page, search=request.args.get('search', ''), type=request.args.get('type')) }}" aria-label="{{ _('Suivant') }}">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+
+<script>
+// Initialize LDAP Tree
+let ldapTree;
+document.addEventListener('DOMContentLoaded', function() {
+    ldapTree = new LDAPTree('ldapTree', (selectedDN) => {
+        document.getElementById('selectedOU').value = selectedDN;
+    });
+    ldapTree.init();
+});
+
+// Group creation
+async function createGroup() {
+    const groupName = document.getElementById('groupName').value;
+    const groupType = document.getElementById('groupType').value;
+    const parentOU = document.getElementById('selectedOU').value;
+
+    if (!groupName || !groupType || !parentOU) {
+        alert("{{ _('Veuillez remplir tous les champs') }}");
+        return;
+    }
+
+    try {
+        const response = await fetch('/groups/api/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: groupName,
+                type: groupType,
+                scope: document.querySelector('input[name="groupScope"]:checked').value,
+                parent_ou: parentOU
+            })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createGroupModal'));
+            modal.hide();
+            window.location.reload();
+        } else {
+            alert(data.error || "{{ _('Une erreur est survenue lors de la création du groupe') }}");
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert("{{ _('Une erreur est survenue lors de la création du groupe') }}");
+    }
+}
+
+// Group deletion
+function showDeleteModal(groupDn) {
+    document.getElementById('groupToDelete').value = groupDn;
+    const modal = new bootstrap.Modal(document.getElementById('deleteGroupModal'));
+    modal.show();
+}
+
+async function confirmDeleteGroup() {
+    const groupDn = document.getElementById('groupToDelete').value;
+    
+    try {
+        const response = await fetch(`/groups/api/${encodeURIComponent(groupDn)}/delete`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteGroupModal'));
+            modal.hide();
+            window.location.reload();
+        } else {
+            alert(data.error || "{{ _('Une erreur est survenue lors de la suppression du groupe') }}");
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert("{{ _('Une erreur est survenue lors de la suppression du groupe') }}");
+    }
+}
+
+let searchTimeout;
+
+function updateFilters() {
+    const searchTerm = document.getElementById('searchInput').value.trim();
+    const typeFilter = document.getElementById('typeFilter').value;
+    const currentUrl = new URL(window.location.href);
+    
+    currentUrl.searchParams.set('search', searchTerm);
+    if (typeFilter) {
+        currentUrl.searchParams.set('type', typeFilter);
+    } else {
+        currentUrl.searchParams.delete('type');
+    }
+    currentUrl.searchParams.set('page', '1'); // Reset to first page on filter change
+    window.location.href = currentUrl.toString();
+}
+
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(updateFilters, 500);
+});
+
+document.getElementById('typeFilter').addEventListener('change', updateFilters);
+</script>
+
+<!-- Modal pour l'export -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">{{ _('Sélectionner les attributs à exporter') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm" data-export-form>
+                    <input type="hidden" id="groupDn" name="group_dn" value="">
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="sn" id="attr_sn" name="attributes" checked>
+                            <label class="form-check-label" for="attr_sn">
+                                {{ _('sn (Nom)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="givenName" id="attr_givenName" name="attributes" checked>
+                            <label class="form-check-label" for="attr_givenName">
+                                {{ _('givenName (Prénom)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="samAccountName" id="attr_samAccountName" name="attributes" checked>
+                            <label class="form-check-label" for="attr_samAccountName">
+                                {{ _('samAccountName (Utilisateur)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="mail" id="attr_mail" name="attributes" checked>
+                            <label class="form-check-label" for="attr_mail">
+                                {{ _('mail (Adresse Mail)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="company" id="attr_company" name="attributes">
+                            <label class="form-check-label" for="attr_company">
+                                {{ _('company (Entreprise)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="department" id="attr_department" name="attributes">
+                            <label class="form-check-label" for="attr_department">
+                                {{ _('department (Service)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="distinguishedName" id="attr_distinguishedName" name="attributes">
+                            <label class="form-check-label" for="attr_distinguishedName">
+                                {{ _('distinguishedName (Identifiant Unique AD)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="employeeID" id="attr_employeeID" name="attributes">
+                            <label class="form-check-label" for="attr_employeeID">
+                                {{ _('employeeID (Matricule)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="ipPhone" id="attr_ipPhone" name="attributes">
+                            <label class="form-check-label" for="attr_ipPhone">
+                                {{ _('ipPhone (Téléphone IP)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="lastLogon" id="attr_lastLogon" name="attributes">
+                            <label class="form-check-label" for="attr_lastLogon">
+                                {{ _('lastLogon (Dernière Connexion)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="manager" id="attr_manager" name="attributes">
+                            <label class="form-check-label" for="attr_manager">
+                                {{ _('manager (Responsable)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="mobile" id="attr_mobile" name="attributes">
+                            <label class="form-check-label" for="attr_mobile">
+                                {{ _('mobile (Téléphone Mobile)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="title" id="attr_title" name="attributes">
+                            <label class="form-check-label" for="attr_title">
+                                {{ _('title (Poste)') }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="whenCreated" id="attr_whenCreated" name="attributes">
+                            <label class="form-check-label" for="attr_whenCreated">
+                                {{ _('whenCreated (Date de Création du Compte)') }}
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Annuler') }}</button>
+                <button type="button" class="btn btn-primary" onclick="exportGroupMembers(event)">{{ _('Exporter') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showExportModal(groupDn) {
+    document.getElementById('groupDn').value = groupDn;
+    var modal = new bootstrap.Modal(document.getElementById('exportModal'));
+    modal.show();
+}
+
+async function exportGroupMembers() {
+    const form = document.getElementById('exportForm');
+    const formData = new FormData(form);
+    const attributes = Array.from(formData.getAll('attributes'));
+    const groupDn = document.getElementById('groupDn').value;
+
+    // Vérifier si des attributs sensibles sont sélectionnés et demander confirmation
+    if (await confirmSensitiveExport(attributes)) {
+        const url = "{{ url_for('groups.export_group_members', group_dn='__DN__') }}".replace('__DN__', encodeURIComponent(groupDn)) + '?attributes=' + encodeURIComponent(attributes.join(','));
+        window.location.href = url;
+    }
+}
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/export.js') }}"></script>
+{% endblock %}

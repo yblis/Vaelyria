@@ -1,0 +1,629 @@
+# French translations for ADManager.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the ADManager project.
+msgid ""
+msgstr ""
+"Project-Id-Version: ADManager 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-02-16 19:56+0000\n"
+"PO-Revision-Date: 2025-02-16 14:31+0000\n"
+"Last-Translator: Djamal BOUSSEFSAF\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: templates/user_create.html:107
+msgid "Date d'expiration du compte"
+msgstr "Date d'expiration du compte"
+
+#: templates/user_edit.html:419
+msgid "Date d'expiration"
+msgstr "Date d'expiration"
+
+#: templates/user_edit.html:420
+msgid "Désactiver l'expiration"
+msgstr "Désactiver l'expiration"
+
+#: templates/user_create.html:108 templates/user_edit.html:421
+msgid "Optionnel - Pour les comptes stagiaires, consultants, prestataires"
+msgstr "Optionnel - Pour les comptes stagiaires, consultants, prestataires"
+
+#: templates/base.html:37
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: templates/base.html:41
+msgid "Search"
+msgstr "Rechercher"
+
+#: templates/base.html:44
+msgid "Create User"
+msgstr "Créer un utilisateur"
+
+#: templates/base.html:47
+msgid "Service Profiles"
+msgstr "Profils de service"
+
+#: templates/base.html:55
+msgid "Groups"
+msgstr "Groupes"
+
+#: templates/base.html:62
+msgid "Administration"
+msgstr "Administration"
+
+#: templates/base.html:66
+msgid "Statistics"
+msgstr "Statistiques"
+
+#: templates/base.html:69
+msgid "Logs"
+msgstr "Journaux"
+
+#: templates/base.html:72
+msgid "LDAP Settings"
+msgstr "Paramètre LDAP"
+
+#: templates/base.html:80
+msgid "Language"
+msgstr "Langue (🇫🇷)"
+
+#: templates/base.html:91
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: templates/base.html:123
+msgid "You are offline"
+msgstr "Vous êtes hors ligne"
+
+#: templates/base.html:130
+msgid "Service Worker successfully registered:"
+msgstr "Service Worker enregistré avec succès:"
+
+#: templates/base.html:133
+msgid "Error registering Service Worker:"
+msgstr "Erreur lors de l'enregistrement du Service Worker:"
+
+#: templates/user_search.html:5
+msgid "User Search"
+msgstr "Recherche d'utilisateurs"
+
+#: templates/user_search.html:11
+msgid "Search by name, username or email"
+msgstr "Rechercher par nom, utilisateur ou email"
+
+#: templates/user_search.html:20
+msgid "Filter by OU"
+msgstr "Filtrer par OU"
+
+#: templates/user_search.html:25
+msgid "All states..."
+msgstr "Tous les états..."
+
+#: templates/user_search.html:26
+msgid "Account enabled"
+msgstr "Compte activé"
+
+#: templates/user_search.html:27
+msgid "Account enabled / Password never expires"
+msgstr "Compte activé / Mot de passe n'expire jamais"
+
+#: templates/user_search.html:28
+msgid "Account disabled"
+msgstr "Compte désactivé"
+
+#: templates/user_search.html:29
+msgid "Account with expired password"
+msgstr "Compte avec mot de passe expiré"
+
+#: templates/user_search.html:30
+msgid "Password never expires"
+msgstr "Mot de passe n'expirant jamais"
+
+#: templates/user_search.html:31
+msgid "Password not required"
+msgstr "Mot de passe non requis"
+
+#: templates/user_search.html:32
+msgid "Account locked"
+msgstr "Compte verrouillé"
+
+#: templates/user_search.html:33
+msgid "User cannot change password"
+msgstr "L'utilisateur ne peut pas changer le mot de passe"
+
+#: templates/user_search.html:34
+msgid "Smart card login required"
+msgstr "Connexion par carte à puce requise"
+
+#: templates/user_search.html:35
+msgid "Kerberos pre-authentication not required"
+msgstr "Pré-authentification Kerberos non requise"
+
+#: templates/user_search.html:41
+msgid "All domains"
+msgstr "Tous les domaines"
+
+#: templates/user_search.html:51
+msgid "Selected OU:"
+msgstr "OU sélectionnée :"
+
+#: templates/user_search.html:52
+msgid "Remove filter"
+msgstr "Supprimer le filtre"
+
+#: templates/user_search.html:66
+msgid "Show only accounts with email address"
+msgstr "Afficher seulement les comptes disposant d'une adresse email"
+
+#: templates/user_search.html:79
+msgid "Select Organizational Unit"
+msgstr "Sélectionner l'unité organisationnelle"
+
+#: templates/user_search.html:80
+msgid "Close"
+msgstr "Fermer"
+
+#: templates/user_search.html:92
+msgid "Clear filter"
+msgstr "Effacer le filtre"
+
+#: templates/user_search.html:93
+msgid "Apply"
+msgstr "Appliquer"
+
+#: templates/user_search.html:102
+msgid "Search Results"
+msgstr "Résultats de la recherche"
+
+#: templates/user_search.html:104
+msgid "User List"
+msgstr "Liste des utilisateurs"
+
+#: templates/user_search.html:107
+msgid "%(total_users)d user"
+msgid_plural "%(total_users)d users"
+msgstr[0] "%(total_users)d utilisateur"
+msgstr[1] "%(total_users)d utilisateurs"
+
+#: templates/user_search.html:114
+msgid "Status"
+msgstr "Statut"
+
+#: templates/user_search.html:116
+msgid "Last Name"
+msgstr "Nom"
+
+#: templates/user_search.html:119
+msgid "First Name"
+msgstr "Prénom"
+
+#: templates/user_search.html:127
+msgid "Organizational Unit"
+msgstr "Unité Organisationnelle"
+
+#: templates/user_search.html:136
+msgid "In trash"
+msgstr "Dans la corbeille"
+
+#: templates/user_search.html:140
+msgid "Account unlocked"
+msgstr "Compte déverrouillé"
+
+#: templates/user_search.html:151
+msgid "View/Edit"
+msgstr "Afficher/Modifier"
+
+#: templates/user_search.html:153
+msgid "Move to trash"
+msgstr "Mettre à la corbeille"
+
+#: templates/user_search.html:156
+msgid "Unlock"
+msgstr "Déverrouiller"
+
+#: templates/user_search.html:158
+msgid "Lock"
+msgstr "Verrouiller"
+
+#: templates/user_search.html:161
+msgid "Restore"
+msgstr "Restaurer"
+
+#: templates/user_search.html:163
+msgid "Move"
+msgstr "Déplacer"
+
+#: templates/user_search.html:164
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
+#: templates/user_search.html:175
+msgid "Export to Excel"
+msgstr "Exporter en Excel"
+
+#: templates/user_search.html:183
+msgid "Reset Password"
+msgstr "Réinitialiser le mot de passe"
+
+#: templates/user_search.html:190
+msgid "New Password"
+msgstr "Nouveau mot de passe"
+
+#: templates/user_search.html:197
+msgid "User must reset password at next login"
+msgstr "L'utilisateur doit réinitialiser son mot de passe à la première connexion"
+
+#: templates/user_search.html:205
+msgid "Enable user if disabled"
+msgstr "Activer l'utilisateur s'il ne l'est pas"
+
+#: templates/user_search.html:229
+msgid "Reset"
+msgstr "Réinitialiser"
+
+#: templates/user_search.html:240
+msgid "Restore User"
+msgstr "Restaurer l'utilisateur"
+
+#: templates/user_search.html:266
+msgid "Select attributes to export"
+msgstr "Sélectionner les attributs à exporter"
+
+#: templates/user_search.html:344
+#, python-format
+msgid "Showing users %(start)d-%(end)d of %(total)d"
+msgstr "Affichage des utilisateurs %(start)d-%(end)d sur %(total)d"
+
+#: templates/user_search.html:346
+msgid "User pagination"
+msgstr "Pagination des utilisateurs"
+
+#: templates/statistics.html:18
+msgid "Overview"
+msgstr "Vue d'ensemble"
+
+#: templates/statistics.html:25
+msgid "User Statistics"
+msgstr "Statistiques utilisateurs"
+
+#: templates/statistics.html:30
+msgid "Total number of users:"
+msgstr "Nombre total d'utilisateurs :"
+
+#: templates/statistics.html:31
+msgid "Active users:"
+msgstr "Utilisateurs actifs :"
+
+#: templates/statistics.html:32
+msgid "Inactive users:"
+msgstr "Utilisateurs inactifs :"
+
+#: templates/statistics.html:33
+msgid "Disabled accounts:"
+msgstr "Comptes désactivés :"
+
+#: templates/statistics.html:34
+msgid "Expired accounts:"
+msgstr "Comptes expirés :"
+
+#: templates/statistics.html:43
+msgid "Group Statistics"
+msgstr "Statistiques des groupes"
+
+#: templates/statistics.html:48
+msgid "Total number of groups:"
+msgstr "Nombre total de groupes :"
+
+#: templates/statistics.html:49
+msgid "Security groups:"
+msgstr "Groupes de sécurité :"
+
+#: templates/statistics.html:50
+msgid "Distribution groups:"
+msgstr "Groupes de distribution :"
+
+#: templates/statistics.html:51
+msgid "Average members:"
+msgstr "Moyenne de membres :"
+
+#: templates/statistics.html:52
+msgid "Empty groups:"
+msgstr "Groupes vides :"
+
+#: templates/statistics.html:64
+msgid "Number of members per group"
+msgstr "Nombre de membres par groupe"
+
+#: templates/statistics.html:74
+msgid "Activity and Logs"
+msgstr "Activité et journaux"
+
+#: templates/statistics.html:84
+msgid "Created users (last 30 days)"
+msgstr "Utilisateurs créés (sur 30 jours)"
+
+#: templates/statistics.html:96
+msgid "Full Name"
+msgstr "Nom Prénom"
+
+#: templates/statistics.html:97
+msgid "Creation Date"
+msgstr "Date de création"
+
+#: templates/statistics.html:118
+msgid "Locked accounts (30d)"
+msgstr "Comptes verrouillés (30j)"
+
+#: templates/statistics.html:131
+msgid "Lock Date"
+msgstr "Date de verrouillage"
+
+#: templates/statistics.html:152
+msgid "Groups without members"
+msgstr "Groupes sans membres"
+
+#: templates/statistics.html:164
+msgid "Group Name"
+msgstr "Nom du groupe"
+
+#: templates/statistics.html:188
+msgid "Disabled users"
+msgstr "Utilisateurs désactivés"
+
+#: templates/statistics.html:208
+msgid "Never"
+msgstr "Jamais"
+
+#: templates/statistics.html:220
+msgid "Inactive users (> 3 months)"
+msgstr "Utilisateurs inactifs (> 3 mois)"
+
+#: templates/statistics.html:276
+msgid "Error parsing statistics data:"
+msgstr "Erreur lors de l'analyse des données statistiques :"
+
+#: templates/logs.html:6
+msgid "Audit Logs"
+msgstr "Journaux d'audit"
+
+#: templates/logs.html:12
+msgid "Period"
+msgstr "Période"
+
+#: templates/logs.html:14
+msgid "Last 24 hours"
+msgstr "24 dernières heures"
+
+#: templates/logs.html:15
+msgid "Last 7 days"
+msgstr "7 derniers jours"
+
+#: templates/logs.html:16
+msgid "Last 30 days"
+msgstr "30 derniers jours"
+
+#: templates/logs.html:17
+msgid "All history"
+msgstr "Tout l'historique"
+
+#: templates/logs.html:23
+msgid "Level"
+msgstr "Niveau"
+
+#: templates/logs.html:25
+msgid "All levels"
+msgstr "Tous les niveaux"
+
+#: templates/logs.html:26
+msgid "Info"
+msgstr "Info"
+
+#: templates/logs.html:27
+msgid "Warning"
+msgstr "Avertissement"
+
+#: templates/logs.html:28
+msgid "Error"
+msgstr "Erreur"
+
+#: templates/logs.html:29
+msgid "Critical"
+msgstr "Critique"
+
+#: templates/logs.html:35
+msgid "Action Type"
+msgstr "Type d'action"
+
+#: templates/logs.html:37
+msgid "All actions"
+msgstr "Toutes les actions"
+
+#: templates/logs.html:46
+msgid "Filter by user"
+msgstr "Filtrer par utilisateur"
+
+#: templates/logs.html:58
+msgid "Date"
+msgstr "Date"
+
+#: templates/logs.html:59
+msgid "User"
+msgstr "Utilisateur"
+
+#: templates/logs.html:60
+msgid "Action"
+msgstr "Action"
+
+#: templates/logs.html:61
+msgid "Details"
+msgstr "Détails"
+
+#: templates/logs.html:63
+msgid "IP"
+msgstr "IP"
+
+#: templates/logs.html:87
+msgid "Previous"
+msgstr "Précédent"
+
+#: templates/logs.html:103
+msgid "Next"
+msgstr "Suivant"
+
+#: templates/settings/ldap.html:5
+msgid "LDAP Configuration"
+msgstr "Configuration LDAP"
+
+#: templates/settings/ldap.html:17
+msgid "Trash OU"
+msgstr "OU Corbeille"
+
+#: templates/settings/ldap.html:20
+msgid "Example: OU=Disabled,DC=example,DC=com"
+msgstr "Exemple : OU=Disabled,DC=example,DC=com"
+
+#: templates/settings/ldap.html:24
+msgid "Default Password"
+msgstr "Mot de passe par défaut"
+
+#: templates/settings/ldap.html:26
+msgid "Leave empty to keep current password"
+msgstr "Laisser vide pour conserver le mot de passe actuel"
+
+#: templates/settings/ldap.html:27
+msgid "Default password for new users"
+msgstr "Mot de passe par défaut pour les nouveaux utilisateurs"
+
+#: templates/settings/ldap.html:31
+msgid "Active Directory Domains"
+msgstr "Domaines Active Directory"
+
+#: templates/settings/ldap.html:33
+msgid "One domain per line (example: example.com)"
+msgstr "Un domaine par ligne (exemple : example.com)"
+
+#: templates/settings/ldap.html:37
+msgid "Microsoft 365 Tenant (For hybrid environments)"
+msgstr "Tenant Microsoft 365 (Pour les environnements hybrides)"
+
+#: templates/settings/ldap.html:44
+msgid "Example: if your domain is @contoso.onmicrosoft.com, enter \"contoso\""
+msgstr "Exemple : si votre domaine est @contoso.onmicrosoft.com, entrez \"contoso\""
+
+#: templates/settings/ldap.html:48
+msgid "Username Configuration"
+msgstr "Configuration du nom d'utilisateur"
+
+#: templates/settings/ldap.html:51
+msgid "Pattern order:"
+msgstr "Ordre du pattern :"
+
+#: templates/settings/ldap.html:55
+msgid "LASTNAME Firstname"
+msgstr "NOM Prénom"
+
+#: templates/settings/ldap.html:61
+msgid "Firstname LASTNAME"
+msgstr "Prénom NOM"
+
+#: templates/settings/ldap.html:69
+msgid "Number of characters first part"
+msgstr "Nombre de caractères première partie"
+
+#: templates/settings/ldap.html:71
+msgid "Number or *"
+msgstr "Nombre ou *"
+
+#: templates/settings/ldap.html:72
+msgid "Use \"*\" for complete word"
+msgstr "Utilisez \"*\" pour le mot complet"
+
+#: templates/settings/ldap.html:77
+msgid "Number of characters second part"
+msgstr "Nombre de caractères deuxième partie"
+
+#: templates/settings/ldap.html:86
+msgid "Separator"
+msgstr "Séparateur"
+
+#: templates/settings/ldap.html:88
+msgid "Optional"
+msgstr "Optionnel"
+
+#: templates/settings/ldap.html:89
+msgid "Separator character (leave empty to not use one)"
+msgstr "Caractère séparateur (laisser vide pour ne pas en utiliser)"
+
+#: templates/settings/ldap.html:93
+msgid "Example for DUPONT Pierre:"
+msgstr "Exemple pour DUPONT Pierre :"
+
+#: templates/settings/ldap.html:102
+msgid "Email Configuration"
+msgstr "Configuration de l'email"
+
+#: templates/settings/ldap.html:105
+msgid "Email format:"
+msgstr "Format de l'email :"
+
+#: templates/settings/ldap.html:109
+msgid "Firstname@{domain.com}"
+msgstr "Prénom@{domaine.fr}"
+
+#: templates/settings/ldap.html:115
+msgid "LASTNAME@{domain.com}"
+msgstr "NOM@{domaine.fr}"
+
+#: templates/settings/ldap.html:121
+msgid "Firstname.LASTNAME@{domain.com}"
+msgstr "Prénom.NOM@{domaine.fr}"
+
+#: templates/settings/ldap.html:127
+msgid "LASTNAME.Firstname@{domain.com}"
+msgstr "NOM.Prénom@{domaine.fr}"
+
+#: templates/settings/ldap.html:167
+msgid "Save"
+msgstr "Enregistrer"
+
+#: templates/settings/ldap.html:249
+msgid "Length parameters must generate at least one character"
+msgstr "Les paramètres de longueur doivent générer au moins un caractère"
+
+#: templates/settings/ldap.html:255
+msgid "Processing error"
+msgstr "Erreur de traitement"
+
+#: templates/service_profiles_edit.html:9
+#, python-format
+msgid "Edit Profile: %(name)s"
+msgstr "Modifier le Profil : %(name)s"
+
+#: templates/service_profiles_edit.html:14
+msgid "Service Name"
+msgstr "Nom du Service"
+
+#: templates/service_profiles_edit.html:166
+msgid "Save Changes"
+msgstr "Enregistrer les modifications"
+
+#: templates/service_profiles_edit.html:190
+msgid "Select..."
+msgstr "Sélectionner..."
+
+#: templates/service_profiles_edit.html:196
+msgid "Select a domain..."
+msgstr "Sélectionnez un domaine..."
+
+#: templates/service_profiles_edit.html:203
+msgid "Select a manager..."
+msgstr "Sélectionnez un manager..."
+
+#: templates/service_profiles_edit.html:224
+msgid "Additional parameters JSON format is invalid."
+msgstr "Le format JSON des paramètres additionnels est invalide."

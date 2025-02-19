@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0">{{ _('New Service Profile') }}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="createForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">{{ _('Service Name') }} *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                            <div class="form-text">{{ _('Example: "IT Service", "Accounting", "HR"') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ou" class="form-label">{{ _('Default Organizational Unit (OU)') }} *</label>
+                            <input type="hidden" id="ou" name="ou" required>
+                            <div id="ou_tree" class="ldap-tree"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="groups" class="form-label">{{ _('Active Directory Groups') }}</label>
+                            <select class="form-select" id="groups" name="groups" multiple>
+                                {% for group in available_groups %}
+                                <option value="{{ group.dn }}">{{ group.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">{{ _('Hold Ctrl (Cmd on Mac) to select multiple groups') }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="domains" class="form-label">{{ _('Domain') }} *</label>
+                            <select class="form-select" id="domains" name="domains" required>
+                                <option value="">{{ _('Select a domain') }}</option>
+                                {% for domain in available_domains %}
+                                <option value="{{ domain.strip() }}">{{ domain.strip() }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">{{ _('Select the domain used by this profile') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="manager" class="form-label">{{ _('Manager') }}</label>
+                            <select class="form-select" id="manager" name="manager">
+                                <option value="">{{ _('Select a manager') }}</option>
+                                {% for manager in available_managers %}
+                                <option value="{{ manager.dn }}">{{ manager.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">{{ _('Select an Active Directory manager for this profile') }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="function" class="form-label">{{ _('Function') }}</label>
+                            <input type="text" class="form-control" id="function" name="function">
+                            <div class="form-text">{{ _('User function (title attribute)') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="service" class="form-label">{{ _('Department') }}</label>
+                            <input type="text" class="form-control" id="service" name="service">
+                            <div class="form-text">{{ _('Department (department attribute)') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="society" class="form-label">{{ _('Company') }}</label>
+                            <input type="text" class="form-control" id="society" name="society">
+                            <div class="form-text">{{ _('Company (company attribute)') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="ip_telephony" name="ip_telephony">
+                                <label class="form-check-label" for="ip_telephony">{{ _('IP Telephony') }}</label>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">{{ _('User Attribute Transformation Rules') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="samaccountname_suffix" class="form-label">{{ _('sAMAccountName Suffix') }}</label>
+                                    <input type="text" class="form-control" id="samaccountname_suffix" name="samaccountname_suffix">
+                                    <div class="form-text">{{ _('Ex: ".ext" → jsmith.ext') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="commonname_suffix" class="form-label">{{ _('Common Name Suffix') }}</label>
+                                    <input type="text" class="form-control" id="commonname_suffix" name="commonname_suffix">
+                                    <div class="form-text">{{ _('Ex: " (External)" → "SMITH John (External)" for cn, name, displayName') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="givenname_suffix" class="form-label">{{ _('Given Name Suffix') }}</label>
+                                    <input type="text" class="form-control" id="givenname_suffix" name="givenname_suffix">
+                                    <div class="form-text">{{ _('Ex: "_External" → "John_External" for givenName') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="mail_suffix" class="form-label">{{ _('Email Suffix') }}</label>
+                                    <input type="text" class="form-control" id="mail_suffix" name="mail_suffix">
+                                    <div class="form-text">{{ _('Ex: ".ext" → john.smith.ext@example.com for mail, userPrincipalName') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="mailnickname_suffix" class="form-label">{{ _('Email Alias Suffix') }}</label>
+                                    <input type="text" class="form-control" id="mailnickname_suffix" name="mailnickname_suffix">
+                                    <div class="form-text">{{ _('Ex: ".ext" → john.smith.ext for mailNickname') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="proxyaddresses_suffix" class="form-label">{{ _('Proxy Addresses Suffix') }}</label>
+                                    <input type="text" class="form-control" id="proxyaddresses_suffix" name="proxyaddresses_suffix">
+                                    <div class="form-text">{{ _('Ex: ".ext" → SMTP:john.smith.ext@example.com') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="targetaddress_suffix" class="form-label">{{ _('Target Address Suffix') }}</label>
+                                    <input type="text" class="form-control" id="targetaddress_suffix" name="targetaddress_suffix">
+                                    <div class="form-text">{{ _('Ex: ".ext" → SMTP:john.smith.ext@example.com') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="extras" class="form-label">{{ _('Additional Parameters') }}</label>
+                            <textarea class="form-control" id="extras" name="extras" rows="4"></textarea>
+                            <div class="form-text">
+                                {{ _('JSON format accepted for parameters like account expiration, home directory, etc.') }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('service_profiles.list_profiles') }}" 
+                               class="btn btn-outline-secondary">
+                                {{ _('Cancel') }}
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                {{ _('Create Profile') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation de l'arborescence LDAP
+    let ldapTree = new LDAPTree('ou_tree', (selectedDN) => {
+        document.getElementById('ou').value = selectedDN;
+    });
+    ldapTree.init();
+
+    // Initialisation de Select2 pour les groupes
+    $('#groups').select2({
+        placeholder: 'Sélectionnez...',
+        width: '100%'
+    });
+
+    // Initialisation de Select2 pour le domaine
+    $('#domains').select2({
+        placeholder: 'Sélectionnez un domaine...',
+        width: '100%',
+        allowClear: true
+    });
+
+    // Configuration spéciale pour le select du manager
+    $('#manager').select2({
+        placeholder: 'Sélectionnez un manager...',
+        width: '100%',
+        templateResult: function(data) {
+            if (!data.id) return data.text;
+            return $(data.element).text(); // Affiche le nom dans la liste déroulante
+        },
+        templateSelection: function(data) {
+            if (!data.id) return data.text;
+            return $(data.element).val(); // Retourne le DN une fois sélectionné
+        }
+    });
+
+    // Validation du format JSON pour les paramètres additionnels
+    $('#extras').on('change', function() {
+        const value = $(this).val();
+        if (value) {
+            try {
+                JSON.parse(value);
+                $(this).removeClass('is-invalid');
+            } catch (e) {
+                $(this).addClass('is-invalid');
+                alert('{{ _('Invalid JSON format for additional parameters.') }}');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% endblock %}

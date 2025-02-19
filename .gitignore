@@ -1,0 +1,5 @@
+__pycache__/
+instance/
+.env
+docker-compose.yml
+migration/

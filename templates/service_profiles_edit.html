@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0">{{ _('Edit Profile: %(name)s', name=profile.name) }}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="editForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">{{ _('Service Name') }} *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ profile.name }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ou" class="form-label">{{ _('Default Organizational Unit (OU)') }} *</label>
+                            <input type="hidden" id="ou" name="ou" value="{{ profile.ou }}" required>
+                            <div id="ou_tree" class="ldap-tree"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="groups" class="form-label">{{ _('Active Directory Groups') }}</label>
+                            <select class="form-select" id="groups" name="groups" multiple>
+                                {% for group in available_groups %}
+                                <option value="{{ group.dn }}"
+                                        {% if group.dn in profile.groups %}selected{% endif %}>
+                                    {{ group.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="domains" class="form-label">{{ _('Domain') }} *</label>
+                            <select class="form-select" id="domains" name="domains" required>
+                                <option value="">{{ _('Select a domain') }}</option>
+                                {% for domain in available_domains %}
+                                {% set clean_domain = domain.strip() %}
+                                <option value="{{ clean_domain }}"
+                                        {% if profile.domains and clean_domain == profile.domains[0] %}selected{% endif %}>
+                                    {{ clean_domain }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">{{ _('Select the domain used by this profile') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="manager" class="form-label">{{ _('Manager') }}</label>
+                            <select class="form-select" id="manager" name="manager">
+                                <option value="">{{ _('Select a manager') }}</option>
+                                {% for manager in available_managers %}
+                                <option value="{{ manager.dn }}"
+                                        {% if manager.dn == profile.manager %}selected{% endif %}>
+                                    {{ manager.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">{{ _('Select an Active Directory manager for this profile') }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="function" class="form-label">{{ _('Function') }}</label>
+                            <input type="text" class="form-control" id="function" name="function" 
+                                   value="{{ profile.function }}">
+                            <div class="form-text">{{ _('User function (title attribute)') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="service" class="form-label">{{ _('Service') }}</label>
+                            <input type="text" class="form-control" id="service" name="service"
+                                   value="{{ profile.service }}">
+                            <div class="form-text">{{ _('Associated service (department attribute)') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="society" class="form-label">{{ _('Company') }}</label>
+                            <input type="text" class="form-control" id="society" name="society"
+                                   value="{{ profile.society }}">
+                            <div class="form-text">{{ _('Associated company (company attribute)') }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="ip_telephony" name="ip_telephony"
+                                       {% if profile.ip_telephony %}checked{% endif %}>
+                                <label class="form-check-label" for="ip_telephony">{{ _('IP Telephony') }}</label>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">{{ _('User attribute transformation rules') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="samaccountname_suffix" class="form-label">{{ _('sAMAccountName Suffix') }}</label>
+                                    <input type="text" class="form-control" id="samaccountname_suffix" name="samaccountname_suffix"
+                                           value="{{ profile.samaccountname_suffix }}">
+                                    <div class="form-text">{{ _('Ex: ".ext" → jdupont.ext') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="commonname_suffix" class="form-label">{{ _('Common Name Suffix') }}</label>
+                                    <input type="text" class="form-control" id="commonname_suffix" name="commonname_suffix"
+                                           value="{{ profile.commonname_suffix }}">
+                                    <div class="form-text">{{ _('Ex: " (External)" → "DUPONT Jean (External)" for cn, name, displayName') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="givenname_suffix" class="form-label">{{ _('Given Name Suffix') }}</label>
+                                    <input type="text" class="form-control" id="givenname_suffix" name="givenname_suffix"
+                                           value="{{ profile.givenname_suffix }}">
+                                    <div class="form-text">{{ _('Ex: "_External" → "Jean_External" for givenName') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="mail_suffix" class="form-label">{{ _('Email Suffix') }}</label>
+                                    <input type="text" class="form-control" id="mail_suffix" name="mail_suffix"
+                                           value="{{ profile.mail_suffix }}">
+                                    <div class="form-text">{{ _('Ex: ".ext" → jean.dupont.ext@example.com for mail, userPrincipalName') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="mailnickname_suffix" class="form-label">{{ _('Email Nickname Suffix') }}</label>
+                                    <input type="text" class="form-control" id="mailnickname_suffix" name="mailnickname_suffix"
+                                           value="{{ profile.mailnickname_suffix }}">
+                                    <div class="form-text">{{ _('Ex: ".ext" → jean.dupont.ext for mailNickname') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="proxyaddresses_suffix" class="form-label">{{ _('Proxy Addresses Suffix') }}</label>
+                                    <input type="text" class="form-control" id="proxyaddresses_suffix" name="proxyaddresses_suffix"
+                                           value="{{ profile.proxyaddresses_suffix }}">
+                                    <div class="form-text">{{ _('Ex: ".ext" → SMTP:jean.dupont.ext@example.com') }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="targetaddress_suffix" class="form-label">{{ _('Target Address Suffix') }}</label>
+                                    <input type="text" class="form-control" id="targetaddress_suffix" name="targetaddress_suffix"
+                                           value="{{ profile.targetaddress_suffix }}">
+                                    <div class="form-text">{{ _('Ex: ".ext" → SMTP:jean.dupont.ext@example.com') }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="extras" class="form-label">{{ _('Additional Parameters') }}</label>
+                            <textarea class="form-control" id="extras" name="extras" 
+                                      rows="4">{{ profile.extras }}</textarea>
+                            <div class="form-text">
+                                {{ _('JSON format accepted for parameters like account expiration, home folder, etc.') }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <a href="{{ url_for('service_profiles.list_profiles') }}" 
+                                   class="btn btn-outline-secondary">
+                                    {{ _('Cancel') }}
+                                </a>
+                            </div>
+                            <button type="submit" class="btn btn-primary ms-2">
+                                {{ _('Save Changes') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // LDAP tree initialization
+    let ldapTree = new LDAPTree('ou_tree', (selectedDN) => {
+        document.getElementById('ou').value = selectedDN;
+    });
+    ldapTree.init().then(() => {
+        // After tree is loaded, select current OU
+        ldapTree.expandPath('{{ profile.ou }}');
+    });
+
+    // Initialize Select2 for groups
+    $('#groups').select2({
+        placeholder: "{{ _('Select...') }}",
+        width: '100%'
+    });
+
+    // Initialize Select2 for domain
+    $('#domains').select2({
+        placeholder: "{{ _('Select a domain...') }}",
+        width: '100%',
+        allowClear: true
+    });
+
+    // Special configuration for manager select
+    $('#manager').select2({
+        placeholder: "{{ _('Select a manager...') }}",
+        width: '100%',
+        templateResult: function(data) {
+            if (!data.id) return data.text;
+            return $(data.element).text();
+        },
+        templateSelection: function(data) {
+            if (!data.id) return data.text;
+            return $(data.element).val();
+        }
+    });
+
+    // JSON validation
+    $('#extras').on('change', function() {
+        const value = $(this).val();
+        if (value) {
+            try {
+                JSON.parse(value);
+                $(this).removeClass('is-invalid');
+            } catch (e) {
+                $(this).addClass('is-invalid');
+                alert("{{ _('Additional parameters JSON format is invalid.') }}");
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  vaelyria:
+    build: .
+#    ports:
+#      - "5000:5000"
+    volumes:
+      - .:/app
+    restart: always
+    networks:
+      - vaelyria
+      - $TRAEFIK_NETWORK
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=$TRAEFIK_NETWORK'
+      
+      # Middleware pour la redirection HTTP vers HTTPS
+      - 'traefik.http.middlewares.redirection.redirectScheme.scheme=https'
+      - 'traefik.http.middlewares.redirection.redirectScheme.permanent=true'
+      
+      # Configuration du service
+      - 'traefik.http.services.vaelyria_tls.loadbalancer.server.port=5000'
+      # port conteneur en https
+      # - 'traefik.http.services.vaelyria_tls.loadbalancer.server.scheme=https'      
+
+      # Routeur pour le trafic HTTP (redirigé vers HTTPS)
+      - 'traefik.http.routers.vaelyria_http.rule=Host(`$DOMAIN`)'
+      - 'traefik.http.routers.vaelyria_http.entrypoints=http'
+      - 'traefik.http.routers.vaelyria_http.middlewares=redirection'
+      
+      # Routeur pour le trafic HTTPS
+      - 'traefik.http.routers.vaelyria_tls.rule=Host(`$DOMAIN`)'
+      - 'traefik.http.routers.vaelyria_tls.entrypoints=https'
+      - 'traefik.http.routers.vaelyria_tls.tls.certresolver=webssl'
+      - 'traefik.http.routers.vaelyria_tls.tls=true'
+
+
+networks:
+  vaelyria:
+    driver: bridge
+  $TRAEFIK_NETWORK:
+    external: true
+
+volumes:
+  app: {}
