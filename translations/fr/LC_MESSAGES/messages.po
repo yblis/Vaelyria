@@ -17,8 +17,8 @@ msgstr ""
 "Generated-By: Babel 2.17.0\n"
 
 #: templates/user_edit.html:334
-msgid "Account Status"
-msgstr "État du compte"
+msgid "Actions rapide"
+msgstr "Actions rapide"
 
 #: templates/user_edit.html:341
 msgid "Active account"

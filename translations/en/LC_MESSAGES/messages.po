@@ -776,8 +776,8 @@ msgid "Rechercher un manager..."
 msgstr "Search for a manager..."
 
 #: templates/user_edit.html:334
-msgid "État du compte"
-msgstr "Account Status"
+msgid "Actions rapide"
+msgstr "Quick Actions"
 
 #: templates/user_edit.html:341
 msgid "Compte actif"
