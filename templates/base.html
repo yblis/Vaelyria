@@ -68,12 +68,16 @@
                             <li><a class="dropdown-item" href="{{ url_for('users.statistics') }}">
                                 <i class="bi bi-graph-up"></i> {{ _('Statistics') }}
                             </a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('ou.manage_ou') }}">
+                                <i class="bi bi-diagram-3"></i> {{ _('Organization Units') }}
+                            </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('logs.view_logs') }}">
                                 <i class="bi bi-journal-text"></i> {{ _('Logs') }}
                             </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('settings.ldap_settings') }}">
                                 <i class="bi bi-sliders"></i> {{ _('LDAP Settings') }}
                             </a></li>
+                            
                         </ul>
                     </li>
     

@@ -335,6 +335,10 @@ $(function() {
                             <label for="mail" class="form-label"><i class="fas fa-envelope me-2"></i>{{ _('Email') }}</label>
                             <input type="email" class="form-control" id="mail" name="mail" value="{{ user.attrs.mail }}">
                         </div>
+                        <div class="mb-3">
+                            <label for="entry_dn" class="form-label"><i class="fas fa-fingerprint me-2"></i>{{ _('DN') }}</label>
+                            <input type="text" class="form-control bg-light" id="entry_dn" value="{{ user.entry_dn }}" readonly>
+                        </div>
                     </div>
                 </div>
                 
@@ -461,6 +465,23 @@ $(function() {
                     </div>
                 </div>
 
+                <!-- Contact -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-address-book section-icon"></i>{{ _('Contact') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="mobile" class="form-label"><i class="fas fa-mobile-alt me-2"></i>{{ _('Mobile') }}</label>
+                            <input type="text" class="form-control" id="mobile" name="mobile" value="{{ user.attrs.mobile }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="ipPhone" class="form-label"><i class="fas fa-phone me-2"></i>{{ _('IP Phone') }}</label>
+                            <input type="text" class="form-control" id="ipPhone" name="ipPhone" value="{{ user.attrs.ipPhone }}">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Groupes -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -490,23 +511,6 @@ $(function() {
                                 </div>
                                 {% endfor %}
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contact -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-address-book section-icon"></i>{{ _('Contact') }}
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="mobile" class="form-label"><i class="fas fa-mobile-alt me-2"></i>{{ _('Mobile') }}</label>
-                            <input type="text" class="form-control" id="mobile" name="mobile" value="{{ user.attrs.mobile }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="ipPhone" class="form-label"><i class="fas fa-phone me-2"></i>{{ _('IP Phone') }}</label>
-                            <input type="text" class="form-control" id="ipPhone" name="ipPhone" value="{{ user.attrs.ipPhone }}">
                         </div>
                     </div>
                 </div>

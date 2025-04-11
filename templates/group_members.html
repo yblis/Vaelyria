@@ -2,6 +2,9 @@
 
 {% block content %}
 <h2>{{ _('Membres du groupe') }}</h2>
+<div class="text-muted mb-4">
+    <i class="fas fa-fingerprint me-2"></i>{{ group_dn }}
+</div>
 <!-- Vue mobile en cartes -->
 <div class="member-cards-list">
     {% for member in members %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">
+        <i class="bi bi-diagram-3"></i> {{ _('Organization Units Management') }}
+    </h1>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="ldap-tree" class="ldap-tree"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tree = new LDAPTree('ldap-tree');
+    tree.init().then(() => {
+        // After tree initialization, find every node and expand it
+        document.querySelectorAll('.ldap-node').forEach(node => {
+            const children = node.querySelector('.children');
+            const icon = node.querySelector('.toggle-icon i');
+            if (children) {
+                children.style.display = 'block';
+                if (icon) {
+                    icon.className = 'fas fa-caret-down';
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

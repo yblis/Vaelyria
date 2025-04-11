@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, send_from_directory, request, session
 from flask_login import login_required, current_user
 from flask_babel import Babel, _, get_locale
-from routes import auth, users, groups, export, service_profiles, api, settings, logs, language
+from routes import auth, users, groups, export, service_profiles, api, settings, logs, language, ou
 from audit_log import setup_audit_logging
 from models import db, LDAPConfig
 from auth_models import User
@@ -137,6 +137,7 @@ app.register_blueprint(settings.bp, url_prefix='/settings')
 app.register_blueprint(api.bp)
 app.register_blueprint(logs.bp, url_prefix='/logs')
 app.register_blueprint(language.bp)
+app.register_blueprint(ou.bp, url_prefix='/settings')
 
 # Add root URL rule to redirect to users.dashboard
 @app.route('/')

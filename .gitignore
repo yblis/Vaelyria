@@ -3,3 +3,4 @@ instance/
 .env
 docker-compose.yml
 migration/
+install_samba_ad_ldaps.sh
